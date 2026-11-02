@@ -1,0 +1,404 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		05E2BD37735195B492867042 /* Junction.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECE2EC3FC6039FB3F123C00A /* Junction.swift */; };
+		1BA11ABBBB0A2B53D7F1F1C9 /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6C4921DA1FD0509F35EB9BC /* World.swift */; };
+		1EA30E06BB2268C491C7B63E /* Aim.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CC89641F56B7743D56C9AF /* Aim.swift */; };
+		20DED10BDB564A05C9BE3610 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C441A66532F32F1F0EA8D544 /* Assets.xcassets */; };
+		496981AC5DA37D1C716AB6C1 /* Save.swift in Sources */ = {isa = PBXBuildFile; fileRef = D599CAC059DC532F9F9F5D9A /* Save.swift */; };
+		5756D9FF8FF7EDC3789D006C /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B7163FA01365FC7966C9F8 /* GameScene.swift */; };
+		6738E915757673FEB96755D6 /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F5012001D00561B0EADA901 /* Story.swift */; };
+		67DA0C9D6290DF2DA5958B26 /* Tutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 757B75CCB5B3B01492F40578 /* Tutorial.swift */; };
+		6A380E1A2FAC0D033542592A /* Assets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DB0BDC951D692818EBDDA6 /* Assets.swift */; };
+		726E10796FFE42478A6D4458 /* HUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6AFF2BE24E24B18E78B2D6 /* HUD.swift */; };
+		75DBFB8FFC7ADE19DF35B9F8 /* KeyHints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3018E9749B3E8F973D37E362 /* KeyHints.swift */; };
+		8F66C34EC81868EF49CDB1BB /* Lighting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5CCFA31C301C7D582656C7F /* Lighting.swift */; };
+		9F1C42E7B2EFD59B38D0E505 /* Tiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DCD2AF08BC496B81E286D31 /* Tiles.swift */; };
+		B4A9D8F6870D350EBB571CD6 /* Defense.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EDBEA6D4BAE23D6FD9F8CBA /* Defense.swift */; };
+		B7C2A29E34006E7719CF9F14 /* Reign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8A177F99626438AC50C0C3 /* Reign.swift */; };
+		B99B261A1FACCB7E1A9AF88D /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = 06CC8980EBD94CB4606810B2 /* Resources */; };
+		B9E4F6F9B4850329774FE5AC /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7D92EA186382B153236CB38 /* Game.swift */; };
+		C0A835E484C7826B9644D2F4 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 9878F6C53EC98F39DED6C5C8 /* Localizable.xcstrings */; };
+		C7CFCC9010511F593D675CF0 /* Entities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678A324DF4C849A09F96B316 /* Entities.swift */; };
+		C84094E9A4F78D2F32375061 /* ChunkRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1303FB7A619E1D3EC0C28423 /* ChunkRenderer.swift */; };
+		D1F010D515CD308CF93B485C /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61A402A12792DA45CF9B1381 /* main.swift */; };
+		ECF0BF59047484B77AF9AA99 /* Jar.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF82BF8412FD757945FE9040 /* Jar.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		06CC8980EBD94CB4606810B2 /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Resources; path = Sources/PixelEarth/Resources; sourceTree = SOURCE_ROOT; };
+		1303FB7A619E1D3EC0C28423 /* ChunkRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkRenderer.swift; sourceTree = "<group>"; };
+		17B7163FA01365FC7966C9F8 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
+		2DCD2AF08BC496B81E286D31 /* Tiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tiles.swift; sourceTree = "<group>"; };
+		3018E9749B3E8F973D37E362 /* KeyHints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHints.swift; sourceTree = "<group>"; };
+		3F5012001D00561B0EADA901 /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
+		44DB0BDC951D692818EBDDA6 /* Assets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assets.swift; sourceTree = "<group>"; };
+		4EDBEA6D4BAE23D6FD9F8CBA /* Defense.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Defense.swift; sourceTree = "<group>"; };
+		61A402A12792DA45CF9B1381 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		678A324DF4C849A09F96B316 /* Entities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entities.swift; sourceTree = "<group>"; };
+		757B75CCB5B3B01492F40578 /* Tutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial.swift; sourceTree = "<group>"; };
+		7B8A177F99626438AC50C0C3 /* Reign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reign.swift; sourceTree = "<group>"; };
+		8F6AFF2BE24E24B18E78B2D6 /* HUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUD.swift; sourceTree = "<group>"; };
+		97CC89641F56B7743D56C9AF /* Aim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Aim.swift; sourceTree = "<group>"; };
+		9878F6C53EC98F39DED6C5C8 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		C441A66532F32F1F0EA8D544 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D599CAC059DC532F9F9F5D9A /* Save.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Save.swift; sourceTree = "<group>"; };
+		E5CCFA31C301C7D582656C7F /* Lighting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lighting.swift; sourceTree = "<group>"; };
+		E6C4921DA1FD0509F35EB9BC /* World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = World.swift; sourceTree = "<group>"; };
+		EAB698D66E92E6FE516A6AFF /* PixelEarth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PixelEarth.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ECE2EC3FC6039FB3F123C00A /* Junction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Junction.swift; sourceTree = "<group>"; };
+		F7D92EA186382B153236CB38 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
+		FF82BF8412FD757945FE9040 /* Jar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Jar.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		88153FBD0B71747494CD87E1 /* PixelEarth */ = {
+			isa = PBXGroup;
+			children = (
+				97CC89641F56B7743D56C9AF /* Aim.swift */,
+				44DB0BDC951D692818EBDDA6 /* Assets.swift */,
+				1303FB7A619E1D3EC0C28423 /* ChunkRenderer.swift */,
+				4EDBEA6D4BAE23D6FD9F8CBA /* Defense.swift */,
+				678A324DF4C849A09F96B316 /* Entities.swift */,
+				F7D92EA186382B153236CB38 /* Game.swift */,
+				17B7163FA01365FC7966C9F8 /* GameScene.swift */,
+				8F6AFF2BE24E24B18E78B2D6 /* HUD.swift */,
+				FF82BF8412FD757945FE9040 /* Jar.swift */,
+				ECE2EC3FC6039FB3F123C00A /* Junction.swift */,
+				3018E9749B3E8F973D37E362 /* KeyHints.swift */,
+				E5CCFA31C301C7D582656C7F /* Lighting.swift */,
+				9878F6C53EC98F39DED6C5C8 /* Localizable.xcstrings */,
+				61A402A12792DA45CF9B1381 /* main.swift */,
+				7B8A177F99626438AC50C0C3 /* Reign.swift */,
+				06CC8980EBD94CB4606810B2 /* Resources */,
+				D599CAC059DC532F9F9F5D9A /* Save.swift */,
+				3F5012001D00561B0EADA901 /* Story.swift */,
+				2DCD2AF08BC496B81E286D31 /* Tiles.swift */,
+				757B75CCB5B3B01492F40578 /* Tutorial.swift */,
+				E6C4921DA1FD0509F35EB9BC /* World.swift */,
+			);
+			path = PixelEarth;
+			sourceTree = "<group>";
+		};
+		9A61AA6AAB032668E5A63FBA /* App */ = {
+			isa = PBXGroup;
+			children = (
+				C441A66532F32F1F0EA8D544 /* Assets.xcassets */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		B8C5BAF0A631CC064F06712F = {
+			isa = PBXGroup;
+			children = (
+				9A61AA6AAB032668E5A63FBA /* App */,
+				DBF4B2BEA94B6CCE40CD29AB /* Sources */,
+				BCE4819C02D36CA24ED146A8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BCE4819C02D36CA24ED146A8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EAB698D66E92E6FE516A6AFF /* PixelEarth.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DBF4B2BEA94B6CCE40CD29AB /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				88153FBD0B71747494CD87E1 /* PixelEarth */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		867C3DE60A3609DEAD30545E /* PixelEarth */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 41C848FCC2A76E570F9A8B15 /* Build configuration list for PBXNativeTarget "PixelEarth" */;
+			buildPhases = (
+				8B2244E84A987CD012F5B2B8 /* Sources */,
+				3B228413D5262EF785A43108 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PixelEarth;
+			packageProductDependencies = (
+			);
+			productName = PixelEarth;
+			productReference = EAB698D66E92E6FE516A6AFF /* PixelEarth.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		16991E79CE11B693467C0A0C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					867C3DE60A3609DEAD30545E = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 09344F9433A91096A90A2051 /* Build configuration list for PBXProject "PixelEarth" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = ko;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+				ko,
+			);
+			mainGroup = B8C5BAF0A631CC064F06712F;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				867C3DE60A3609DEAD30545E /* PixelEarth */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3B228413D5262EF785A43108 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				20DED10BDB564A05C9BE3610 /* Assets.xcassets in Resources */,
+				C0A835E484C7826B9644D2F4 /* Localizable.xcstrings in Resources */,
+				B99B261A1FACCB7E1A9AF88D /* Resources in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8B2244E84A987CD012F5B2B8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1EA30E06BB2268C491C7B63E /* Aim.swift in Sources */,
+				6A380E1A2FAC0D033542592A /* Assets.swift in Sources */,
+				C84094E9A4F78D2F32375061 /* ChunkRenderer.swift in Sources */,
+				B4A9D8F6870D350EBB571CD6 /* Defense.swift in Sources */,
+				C7CFCC9010511F593D675CF0 /* Entities.swift in Sources */,
+				B9E4F6F9B4850329774FE5AC /* Game.swift in Sources */,
+				5756D9FF8FF7EDC3789D006C /* GameScene.swift in Sources */,
+				726E10796FFE42478A6D4458 /* HUD.swift in Sources */,
+				ECF0BF59047484B77AF9AA99 /* Jar.swift in Sources */,
+				05E2BD37735195B492867042 /* Junction.swift in Sources */,
+				75DBFB8FFC7ADE19DF35B9F8 /* KeyHints.swift in Sources */,
+				8F66C34EC81868EF49CDB1BB /* Lighting.swift in Sources */,
+				B7C2A29E34006E7719CF9F14 /* Reign.swift in Sources */,
+				496981AC5DA37D1C716AB6C1 /* Save.swift in Sources */,
+				6738E915757673FEB96755D6 /* Story.swift in Sources */,
+				9F1C42E7B2EFD59B38D0E505 /* Tiles.swift in Sources */,
+				67DA0C9D6290DF2DA5958B26 /* Tutorial.swift in Sources */,
+				1BA11ABBBB0A2B53D7F1F1C9 /* World.swift in Sources */,
+				D1F010D515CD308CF93B485C /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		073FCC329428407ED676ACE9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = "Sources/PixelEarth-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.leeo.pixelearth;
+				PRODUCT_NAME = PixelEarth;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		079A14001B5A12A44AAE86EC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		92187E1933DD114201A9A274 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = "Sources/PixelEarth-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.leeo.pixelearth;
+				PRODUCT_NAME = PixelEarth;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E5C8C2F10173790E8CF25599 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		09344F9433A91096A90A2051 /* Build configuration list for PBXProject "PixelEarth" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				079A14001B5A12A44AAE86EC /* Debug */,
+				E5C8C2F10173790E8CF25599 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		41C848FCC2A76E570F9A8B15 /* Build configuration list for PBXNativeTarget "PixelEarth" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				92187E1933DD114201A9A274 /* Debug */,
+				073FCC329428407ED676ACE9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 16991E79CE11B693467C0A0C /* Project object */;
+}

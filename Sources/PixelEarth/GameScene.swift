@@ -1,0 +1,664 @@
+import Foundation
+import SpriteKit
+import AppKit
+
+final class GameScene: SKScene {
+    let game = Game()
+    let assets = Assets.shared
+    var chunkRenderer: ChunkRenderer!
+    let cam = SKCameraNode()
+    let worldNode = SKNode()
+    let entityNode = SKNode()
+    let fxNode = SKNode()
+    let bgNode = SKNode()
+    var hud: HUD!
+    var zoom: CGFloat = 2
+    var zoomIndex = 1 { didSet { zoom = [1.5, 2, 3][zoomIndex]; applyZoom() } }
+
+    // background pieces
+    var skyNode = SKSpriteNode()
+    var starsNode = SKSpriteNode()
+    var sunNode = SKSpriteNode(), moonNode = SKSpriteNode()
+    var mountainsA: [SKSpriteNode] = [], mountainsB: [SKSpriteNode] = []
+    var cloudNodes: [SKSpriteNode] = []
+    var cloudOffsets: [CGFloat] = []
+
+    // lighting
+    let lightSprite = SKSpriteNode(color: .white, size: CGSize(width: 1, height: 1))
+    var lightData = [UInt8]()
+    var lightRect = (x0: 0, y0: 0, x1: -1, y1: -1)
+
+    // entities
+    let playerNode = SKNode()
+    let playerBody = SKSpriteNode()
+    let armNode = SKSpriteNode()
+    let heldNode = SKSpriteNode()
+    var enemyNodes: [UUID: SKSpriteNode] = [:]
+    var dropNodes: [UUID: SKSpriteNode] = [:]
+    var arrowNodes: [UUID: SKSpriteNode] = [:]
+    var floatNodes: [UUID: SKLabelNode] = [:]
+    var particleNodes: [SKSpriteNode] = []
+    let cursorNode = SKSpriteNode()
+    var digKick: CGFloat = 0    // 1 on a strike, fading: jolts the body and the block
+    let crownNode = SKSpriteNode()
+    var turretNodes: [SKSpriteNode] = []
+    let crackNode = SKSpriteNode()
+
+    // story / light-gate visuals
+    var revealNodes: [Int: SKSpriteNode] = [:]
+    var npcNodes: [Int: SKNode] = [:]
+    let coreNode = SKSpriteNode()
+    let jarGlow = SKSpriteNode()
+    var shake = 0.0
+
+    var lastTime: TimeInterval = 0
+    var keysDown = Set<String>()
+    var mouseScene = CGPoint.zero
+    var paused_ = true
+    var lightDirty = true
+    var snowTimer = 0.0
+    var snapCamera = false
+    /// Paintings in the side passages: names, scratches, cots, the painted sky. Drawn over tiles, under the lighting.
+    let decorNode = SKNode()
+
+    func buildPassageDecor() {
+        decorNode.removeAllChildren()
+        for j in Junction.all {
+            for d in j.decor(worldWidth: game.world.w) {
+                guard let tex = assets.decor[d.kind] else { continue }
+                let n = SKSpriteNode(texture: tex); n.anchorPoint = CGPoint(x: 0, y: 1); n.size = tex.size()
+                n.position = scenePos(Double(d.x), Double(d.y)); decorNode.addChild(n)
+            }
+        }
+    }
+
+    /// Turning a corner: the view jumps to the passage under a dark panel that sweeps away sideways, like the wall swinging past.
+    func playTurn(toRight: Bool) {
+        snapCamera = true; lightDirty = true
+        let w = size.width / zoom, h = size.height / zoom
+        let curtain = SKSpriteNode(color: .black, size: CGSize(width: w * 1.2, height: h * 1.2)); curtain.zPosition = 30
+        let edge = SKSpriteNode(color: SKColor(white: 0.25, alpha: 1), size: CGSize(width: 6 / zoom * 3, height: h * 1.2))
+        edge.position = CGPoint(x: (toRight ? -1 : 1) * w * 0.6, y: 0); curtain.addChild(edge)
+        cam.addChild(curtain)
+        let dir: CGFloat = toRight ? -1 : 1
+        curtain.run(.sequence([.wait(forDuration: 0.06), .group([.moveBy(x: dir * w * 1.25, y: 0, duration: 0.38), .fadeAlpha(to: 0.6, duration: 0.38)]), .removeFromParent()]))
+        cam.run(.sequence([.scaleX(to: cam.xScale * 0.92, duration: 0.08), .scaleX(to: cam.xScale, duration: 0.3)]))
+    }
+
+    override func didMove(to view: SKView) {
+        backgroundColor = SKColor(red: 0.03, green: 0.04, blue: 0.08, alpha: 1)
+        scaleMode = .resizeFill
+        camera = cam; addChild(cam)
+        chunkRenderer = ChunkRenderer(world: game.world)
+        addChild(bgNode)              // bg content is attached to camera below
+        addChild(worldNode)
+        worldNode.addChild(chunkRenderer.node)
+        worldNode.addChild(decorNode)
+        worldNode.addChild(entityNode)
+        worldNode.addChild(fxNode)
+        setupBackground()
+        setupPlayer()
+        setupLighting()
+        hud = HUD(scene: self)
+        cam.addChild(hud.root)
+        applyZoom()
+
+        game.onTileChanged = { [weak self] x, y in self?.chunkRenderer.invalidate(tileX: x, tileY: y); self?.lightDirty = true }
+        game.onSFX = { Sound.shared.play($0) }
+        game.onDigStrike = { [weak self] in guard let self = self else { return }; self.shake = max(self.shake, 0.1); self.digKick = 1 }
+        game.onMessage = { [weak self] m in self?.hud.showMessage(m) }
+        game.onTip = { [weak self] m in self?.hud.showTip(m) }
+        game.onInventoryChanged = { [weak self] in self?.hud.inventoryDirty = true }
+        game.onSave = { [weak self] in self?.save() }
+        game.onStoryEvent = { [weak self] ev in
+            guard let self = self else { return }
+            switch ev {
+            case "disaster": self.shake = 1.6
+            case "tremor": self.shake = 0.5
+            case "collapse": self.shake = 1.2
+            case "choice": self.hud.showChoice()
+            case "up", "stay": self.chunkRenderer.coreAwake = true; self.chunkRenderer.invalidate(tileX: self.game.world.coreX, tileY: self.game.world.coreY)
+            case "sky": self.shake = 0.4
+            case "turnLeft", "turnRight": self.playTurn(toRight: ev == "turnRight")
+            default: break
+            }
+        }
+
+        // a deterministic world behind the menu so the title screen is not empty
+        game.world.generate(seed: 20261029)
+        game.placePlayer()
+        hud.showMenu(hasSave: SaveStore.exists())
+        view.window?.makeFirstResponder(self)
+    }
+
+    func applyZoom() {
+        cam.setScale(1 / zoom)
+        layoutBackground()
+        hud?.layout()
+    }
+
+    override func didChangeSize(_ oldSize: CGSize) { layoutBackground(); hud?.layout() }
+
+    // MARK: setup
+
+    func setupBackground() {
+        skyNode = SKSpriteNode(color: .black, size: CGSize(width: 10, height: 10)); skyNode.zPosition = -100
+        cam.addChild(skyNode)
+        starsNode = SKSpriteNode(texture: assets.stars); starsNode.zPosition = -99; starsNode.alpha = 0
+        cam.addChild(starsNode)
+        sunNode = SKSpriteNode(texture: assets.glow); sunNode.color = SKColor(red: 1, green: 0.93, blue: 0.6, alpha: 1); sunNode.colorBlendFactor = 1; sunNode.zPosition = -98; sunNode.size = CGSize(width: 90, height: 90)
+        moonNode = SKSpriteNode(texture: assets.glow); moonNode.color = SKColor(red: 0.85, green: 0.9, blue: 1, alpha: 1); moonNode.colorBlendFactor = 1; moonNode.zPosition = -98; moonNode.size = CGSize(width: 60, height: 60)
+        cam.addChild(sunNode); cam.addChild(moonNode)
+        for i in 0..<4 {
+            let a = SKSpriteNode(texture: assets.mountains0); a.anchorPoint = CGPoint(x: 0, y: 0); a.zPosition = -97; a.colorBlendFactor = 1
+            let b = SKSpriteNode(texture: assets.mountains1); b.anchorPoint = CGPoint(x: 0, y: 0); b.zPosition = -96; b.colorBlendFactor = 1
+            cam.addChild(a); cam.addChild(b); mountainsA.append(a); mountainsB.append(b); _ = i
+        }
+        for i in 0..<10 {
+            let c = SKSpriteNode(texture: Assets.sub(assets.clouds, (i % 3) * 64, 0, 64, 32)); c.zPosition = -95; c.alpha = 0.8
+            c.setScale(CGFloat.random(in: 1.5...3)); cam.addChild(c); cloudNodes.append(c); cloudOffsets.append(CGFloat.random(in: 0...2000))
+        }
+    }
+
+    /// Background sprites and the HUD are camera children: SpriteKit cancels the camera's scale for them, so they are sized in plain points.
+    func layoutBackground() {
+        let w = size.width, h = size.height
+        skyNode.size = CGSize(width: w + 4, height: h + 4)
+        starsNode.size = CGSize(width: w + 4, height: h + 4)
+        for (i, m) in mountainsA.enumerated() { m.size = CGSize(width: 768, height: 240); _ = i }
+        for m in mountainsB { m.size = CGSize(width: 768, height: 240) }
+    }
+
+    func setupPlayer() {
+        playerBody.texture = assets.playerFrames[0][0]; playerBody.size = CGSize(width: 20, height: 32); playerBody.anchorPoint = CGPoint(x: 0.5, y: 0)
+        playerNode.addChild(playerBody)
+        armNode.texture = assets.armFrames[0]; armNode.size = CGSize(width: 6, height: 12); armNode.anchorPoint = CGPoint(x: 0.5, y: 0.92); armNode.zPosition = 1
+        armNode.position = CGPoint(x: 1, y: 15)
+        heldNode.size = CGSize(width: 14, height: 14); heldNode.anchorPoint = CGPoint(x: 0.2, y: 0.2); heldNode.position = CGPoint(x: 1, y: -9); heldNode.zRotation = -0.3
+        armNode.addChild(heldNode)
+        playerNode.addChild(armNode)
+        crownNode.texture = assets.itemTexture(Item.crown); crownNode.size = CGSize(width: 14, height: 14); crownNode.position = CGPoint(x: 0, y: 34); crownNode.zPosition = 2; crownNode.isHidden = true
+        playerNode.addChild(crownNode)
+        playerNode.zPosition = 10
+        entityNode.addChild(playerNode)
+        cursorNode.texture = assets.cursor; cursorNode.size = CGSize(width: 18, height: 18); cursorNode.zPosition = 50; cursorNode.alpha = 0.9
+        fxNode.addChild(cursorNode)
+        crackNode.texture = assets.pixel; crackNode.size = CGSize(width: 16, height: 16); crackNode.color = .black; crackNode.colorBlendFactor = 1; crackNode.alpha = 0; crackNode.zPosition = 5
+        fxNode.addChild(crackNode)
+        jarGlow.texture = assets.glow; jarGlow.size = CGSize(width: 70, height: 70); jarGlow.colorBlendFactor = 1; jarGlow.blendMode = .add; jarGlow.zPosition = 45; jarGlow.alpha = 0.35
+        fxNode.addChild(jarGlow)
+        coreNode.texture = assets.coreFrames[0]; coreNode.size = CGSize(width: 48, height: 48); coreNode.anchorPoint = CGPoint(x: 0.5, y: 0); coreNode.zPosition = 6
+        entityNode.addChild(coreNode)
+    }
+
+    func setupLighting() {
+        lightSprite.blendMode = .multiply
+        lightSprite.anchorPoint = CGPoint(x: 0, y: 0)
+        lightSprite.zPosition = 40
+        worldNode.addChild(lightSprite)
+    }
+
+    // MARK: game flow
+
+    func startNew() { game.newGame(); afterLoad() }
+    func continueGame() {
+        if game.loaded { paused_ = false; hud.hideMenu(); return }
+        if SaveStore.load(into: game) {
+            if let d = SaveStore.lastLoaded { Sound.shared.enabled = d.sound; if d.zoom >= 0 && d.zoom < 3 { zoomIndex = d.zoom } }
+            afterLoad()
+        } else { startNew() }
+    }
+    private func afterLoad() {
+        chunkRenderer.invalidateAll(); lightDirty = true; paused_ = false
+        for (_, n) in enemyNodes { n.removeFromParent() }; enemyNodes.removeAll()
+        for (_, n) in dropNodes { n.removeFromParent() }; dropNodes.removeAll()
+        for (_, n) in npcNodes { n.removeFromParent() }; npcNodes.removeAll()
+        for (_, n) in revealNodes { n.removeFromParent() }; revealNodes.removeAll()
+        chunkRenderer.coreAwake = game.act >= 3
+        buildPassageDecor()
+        hud.hideMenu(); hud.inventoryDirty = true
+        cam.position = scenePos(game.player.x, game.player.y)
+    }
+    func save() { if game.loaded { SaveStore.save(game, zoom: zoomIndex, sound: Sound.shared.enabled) } }
+    func openMenu() { save(); paused_ = true; hud.showMenu(hasSave: game.loaded || SaveStore.exists()) }
+
+    // MARK: input
+
+    override var acceptsFirstResponder: Bool { true }
+
+    /// Physical key names, so shortcuts keep working with Korean or any other input source selected.
+    private static let keyNames: [UInt16: String] = [
+        11: "b", 9: "v", 0: "a", 1: "s", 2: "d", 13: "w", 12: "q", 14: "e", 15: "r", 17: "t", 3: "f", 34: "i", 38: "j", 40: "k", 37: "l", 46: "m",
+        18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9",
+        123: "left", 124: "right", 126: "up", 125: "down", 49: "space", 36: "return", 76: "return",
+    ]
+
+    override func keyDown(with event: NSEvent) {
+        if event.isARepeat { return }
+        if event.keyCode == 53 {
+            if hud.panelOpen { hud.closePanels() } else if paused_ { if game.loaded { continueGame() } } else { openMenu() }
+            return
+        }
+        guard let c = GameScene.keyNames[event.keyCode] else { return }
+        keysDown.insert(c)
+        if hud.modalOpen || hud.panelOpen {
+            if hud.handleNavKey(c) { return }
+        }
+        if paused_ { return }
+        if let d = Int(c), d >= 1 && d <= 9 { selectSlot(d - 1) }
+        switch c {
+        case "t": game.skipTutorial()
+        case "e": hud.togglePanel(.craft)
+        case "i": hud.togglePanel(.inventory)
+        case "j": hud.togglePanel(.jar)
+        case "r": hud.togglePanel(.reign)
+        case "b": game.buildTurret()
+        case "v": game.buildWall()
+        case "q": game.dropHeld()
+        case "m": hud.showMinimapLarge.toggle()
+        case "f": game.feedJar(slot: game.player.sel); if hud.panelKind == .jar { hud.openPanel(.jar) }
+        case "k":
+            game.input.keyboardAim = true
+            if !talkToNearbyNPC() { game.input.clicked = true }
+        case "l": game.input.keyboardAim = true
+        default: break
+        }
+    }
+    override func keyUp(with event: NSEvent) {
+        if let c = GameScene.keyNames[event.keyCode] { keysDown.remove(c) }
+    }
+    /// Camp folk are talked to with K, like everything else in reach.
+    private func talkToNearbyNPC() -> Bool {
+        let p = game.player
+        for (i, n) in npcNodes where abs(n.position.x / TILE_PX - CGFloat(p.x)) < 3 && abs(-n.position.y / TILE_PX - CGFloat(p.y)) < 4 {
+            hud.showMessage(npcLine(i)); return true
+        }
+        return false
+    }
+    func selectSlot(_ i: Int) {
+        game.player.sel = i; hud.inventoryDirty = true
+        if let s = game.player.held { hud.showTip(itemName(s.id) + ((ITEMS[s.id]?.use != nil) ? " · K 사용" : "")) }
+    }
+    override func mouseDown(with event: NSEvent) {
+        mouseScene = event.location(in: self)
+        game.input.keyboardAim = false
+        if hud.handleClick(scenePoint: mouseScene) { return }
+        if paused_ { return }
+        if let n = nodes(at: mouseScene).first(where: { ($0.name ?? "").hasPrefix("npc:") }), let i = Int(n.name!.dropFirst(4)) { hud.showMessage(npcLine(i)); return }
+        game.input.mouseDown = true; game.input.clicked = true
+    }
+    override func mouseDragged(with event: NSEvent) { mouseScene = event.location(in: self) }
+    override func mouseUp(with event: NSEvent) { game.input.mouseDown = false }
+    override func rightMouseDown(with event: NSEvent) { mouseScene = event.location(in: self); game.input.keyboardAim = false; if !hud.panelOpen && !paused_ { game.input.rightDown = true } }
+    override func rightMouseDragged(with event: NSEvent) { mouseScene = event.location(in: self) }
+    override func rightMouseUp(with event: NSEvent) { game.input.rightDown = false }
+    override func scrollWheel(with event: NSEvent) {
+        if paused_ { return }
+        let dy = event.scrollingDeltaY
+        if abs(dy) < 0.5 { return }
+        selectSlot((game.player.sel + (dy < 0 ? 1 : 8)) % 9)
+    }
+
+    func pollMouse() {
+        guard let v = view, let win = v.window else { return }
+        let p = win.mouseLocationOutsideOfEventStream
+        let inView = v.convert(p, from: nil)
+        mouseScene = convertPoint(fromView: inView)
+    }
+
+    // MARK: frame
+
+    override func update(_ currentTime: TimeInterval) {
+        let dt = lastTime == 0 ? 1.0 / 60 : min(0.05, currentTime - lastTime)
+        lastTime = currentTime
+        pollMouse()
+        let wm = (x: Double(mouseScene.x / TILE_PX), y: Double(-mouseScene.y / TILE_PX))
+        if !paused_ {
+            game.input.left = keysDown.contains("a") || keysDown.contains("left")
+            game.input.right = keysDown.contains("d") || keysDown.contains("right")
+            game.input.jump = keysDown.contains("space")
+            game.input.up = keysDown.contains("w") || keysDown.contains("up")
+            game.input.actHeld = keysDown.contains("k"); game.input.placeHeld = keysDown.contains("l")
+            game.input.down = keysDown.contains("s") || keysDown.contains("down")
+            game.input.mouseX = wm.x; game.input.mouseY = wm.y
+            game.input.uiOpen = hud.panelOpen
+            game.update(dt)
+        }
+        // camera follows the player
+        let target = scenePos(game.player.x + game.player.face * 1.5, game.player.y + game.player.h / 2)
+        let halfW = size.width / zoom / 2, halfH = size.height / zoom / 2
+        game.viewHalfTiles = Int(ceil(halfW / TILE_PX))
+        var cx = cam.position.x + (target.x - cam.position.x) * CGFloat(min(1, dt * 6))
+        var cy = cam.position.y + (target.y - cam.position.y) * CGFloat(min(1, dt * 6))
+        if snapCamera { cx = target.x; cy = target.y; snapCamera = false }
+        cx = max(halfW, min(CGFloat(game.world.w) * TILE_PX - halfW, cx))
+        cy = min(-halfH, max(-CGFloat(game.world.h) * TILE_PX + halfH, cy))
+        if shake > 0 { shake -= dt; cx += CGFloat.random(in: -3...3) * CGFloat(min(1, shake)); cy += CGFloat.random(in: -3...3) * CGFloat(min(1, shake)) }
+        cam.position = CGPoint(x: cx, y: cy)
+
+        let vx0 = Int(floor((cx - halfW) / TILE_PX)), vx1 = Int(ceil((cx + halfW) / TILE_PX))
+        let vy0 = Int(floor(-(cy + halfH) / TILE_PX)), vy1 = Int(ceil(-(cy - halfH) / TILE_PX))
+        chunkRenderer.update(visibleX0: vx0, visibleY0: vy0, visibleX1: vx1, visibleY1: vy1, dt: dt)
+        if lightDirty || game.frame % 3 == 0 {
+            game.recomputeLight(x0: vx0 - 14, y0: vy0 - 14, x1: vx1 + 14, y1: vy1 + 14)
+            uploadLight(x0: vx0 - 1, y0: vy0 - 1, x1: vx1 + 1, y1: vy1 + 1)
+            lightDirty = false
+        }
+        updateBackground(dt)
+        syncEntities(dt)
+        syncParticles()
+        if game.frame % 2 == 0 { syncReveals(x0: vx0, y0: vy0, x1: vx1, y1: vy1) }
+        syncStoryNodes()
+        updateCursor(game.input.keyboardAim ? (game.aimX, game.aimY) : wm)
+        hud.update(dt, game: game, zoom: zoom)
+        // ambient snow
+        if !paused_ && game.world.biomeAt(Int(game.player.x)) == 1 && Int(game.player.y) < game.world.surfaceAt(Int(game.player.x)) + 2 {
+            snowTimer += dt
+            if snowTimer > 0.04 {
+                snowTimer = 0
+                game.particles.append(Particle(x: Double(vx0) + Double.random(in: 0..<Double(vx1 - vx0 + 1)), y: Double(vy0) - 1, vx: Double.random(in: -1...0), vy: Double.random(in: 2...4), t: 10, life: 10, color: RGB(r: 255, g: 255, b: 255), snow: true))
+            }
+        }
+    }
+
+    func uploadLight(x0: Int, y0: Int, x1: Int, y1: Int) {
+        let cx0 = max(0, x0), cy0 = max(0, y0), cx1 = min(game.world.w - 1, x1), cy1 = min(game.world.h - 1, y1)
+        guard cx1 >= cx0, cy1 >= cy0 else { return }
+        let w = cx1 - cx0 + 1, h = cy1 - cy0 + 1
+        if lightData.count != w * h * 4 { lightData = [UInt8](repeating: 255, count: w * h * 4) }
+        let L = game.light, W = game.world.w
+        var k = 0
+        for y in cy0...cy1 {
+            for x in cx0...cx1 {
+                let i = y * W + x
+                let r = L.r[i], g = L.g[i], b = L.b[i]
+                lightData[k] = r &* 17; lightData[k + 1] = g &* 17; lightData[k + 2] = b &* 17; lightData[k + 3] = 255
+                k += 4
+                if Int(r) + Int(g) + Int(b) > 6 { game.world.explored[i] = 1 }
+            }
+        }
+        let tex = SKTexture(data: Data(lightData), size: CGSize(width: w, height: h), flipped: true)
+        tex.filteringMode = .linear
+        lightSprite.texture = tex
+        lightSprite.size = CGSize(width: CGFloat(w) * TILE_PX, height: CGFloat(h) * TILE_PX)
+        lightSprite.position = scenePos(Double(cx0), Double(cy1 + 1))
+    }
+
+    // MARK: background
+
+    func updateBackground(_ dt: Double) {
+        let dl = CGFloat(game.dayLight)
+        let dusk = max(0, 1 - abs(dl - 0.3) * 4)
+        let r = (12 + dl * 110 + dusk * 150) / 255, g = (16 + dl * 170 + dusk * 50) / 255, b = (38 + dl * 200) / 255
+        skyNode.color = SKColor(red: r, green: g, blue: b, alpha: 1)
+        starsNode.alpha = max(0, (0.45 - dl) * 1.6)
+        let w = size.width, h = size.height
+        let ang = CGFloat(game.worldTime - 0.25) * .pi * 2
+        sunNode.position = CGPoint(x: cos(ang) * w * 0.45, y: sin(ang) * h * 0.55 - h * 0.1)
+        moonNode.position = CGPoint(x: -cos(ang) * w * 0.45, y: -sin(ang) * h * 0.55 - h * 0.1)
+        let camX = cam.position.x, camY = cam.position.y
+        let mw: CGFloat = 768
+        let tintA = SKColor(red: 0.25 + dl * 0.35, green: 0.3 + dl * 0.4, blue: 0.45 + dl * 0.45, alpha: 1)
+        let tintB = SKColor(red: 0.18 + dl * 0.25, green: 0.26 + dl * 0.35, blue: 0.3 + dl * 0.3, alpha: 1)
+        func place(_ nodes: [SKSpriteNode], par: CGFloat, baseY: CGFloat, tint: SKColor) {
+            let off = (-camX * par).truncatingRemainder(dividingBy: mw)
+            let start = off - mw
+            for (i, n) in nodes.enumerated() {
+                n.position = CGPoint(x: -w / 2 + start + CGFloat(i) * mw, y: -h / 2 + baseY - camY * par * 0.3)
+                n.color = tint
+            }
+        }
+        place(mountainsA, par: 0.12, baseY: h * 0.25 + 10, tint: tintA)
+        place(mountainsB, par: 0.25, baseY: h * 0.12, tint: tintB)
+        for (i, c) in cloudNodes.enumerated() {
+            cloudOffsets[i] += CGFloat(dt) * (6 + CGFloat(i) * 1.5)
+            let span = w + 400
+            var x = (cloudOffsets[i] - camX * 0.3).truncatingRemainder(dividingBy: span)
+            if x < 0 { x += span }
+            c.position = CGPoint(x: x - w / 2 - 200, y: h * 0.18 + CGFloat(i % 5) * h * 0.06 - camY * 0.05)
+            c.alpha = 0.35 + dl * 0.5
+        }
+        // underground: fade the sky background to cave darkness
+        let depth = CGFloat(game.player.y - Double(game.world.surfaceAt(Int(game.player.x))))
+        let under = max(0, min(1, (depth - 6) / 14))
+        for n in mountainsA + mountainsB { n.alpha = 1 - under }
+        for c in cloudNodes { c.alpha = (0.35 + dl * 0.5) * (1 - under) }
+        if under > 0 { skyNode.color = SKColor(red: r * (1 - under) + 0.05 * under, green: g * (1 - under) + 0.05 * under, blue: b * (1 - under) + 0.08 * under, alpha: 1) }
+    }
+
+    // MARK: entities
+
+    func syncEntities(_ dt: Double) {
+        let p = game.player
+        playerNode.position = scenePos(p.x, p.y + p.h)
+        let set = p.armorId == Item.ironArmor ? 1 : (p.armorId == Item.goldArmor ? 2 : (p.armorId == Item.diamondArmor ? 3 : 0))
+        var pose = 0
+        if !p.ground { pose = p.vy < 0 ? 7 : 8 } else if abs(p.vx) > 0.5 { pose = 1 + Int(p.anim) % 6 }
+        playerBody.texture = assets.playerFrames[set][pose]
+        armNode.texture = assets.armFrames[set]
+        crownNode.isHidden = !game.rulesCurrentFloor
+        playerNode.xScale = p.face < 0 ? -1 : 1
+        playerNode.alpha = p.dead > 0 ? 0 : ((p.iframe > 0 && Int(p.iframe * 20) % 2 == 0) ? 0.35 : 1)
+        let swing = p.swing > 0 ? CGFloat(p.swing / 0.3) * 1.9 : 0
+        armNode.zRotation = -(0.35 + swing) + (abs(p.vx) > 0.5 && p.ground ? CGFloat(sin(p.anim)) * 0.3 : 0)
+        digKick = max(0, digKick - CGFloat(dt) * 8)
+        playerBody.position.y = 0; playerBody.position.x = 0
+        if let m = game.mineTarget, game.mineProg > 0 {
+            // Raised back on the wind-up, snapping onto the block on the strike.
+            let dx = (Double(m.x) + 0.5 - p.x) * p.face, up = (p.y + 0.7) - (Double(m.y) + 0.5)
+            let aim = CGFloat(atan2(dx, -up))
+            let t = CGFloat(game.digPhase.truncatingRemainder(dividingBy: 1))
+            let wind = t < 0.25 ? 1 - t / 0.25 : (t - 0.25) / 0.75
+            armNode.zRotation = aim + 1.3 * wind - 0.15
+            playerBody.position.y = -digKick
+            playerBody.position.x = -digKick
+        }
+        if let h = p.held { heldNode.isHidden = false; heldNode.texture = assets.itemTexture(h.id); heldNode.size = h.id < 100 ? CGSize(width: 10, height: 10) : CGSize(width: 16, height: 16) } else { heldNode.isHidden = true }
+
+        // enemies
+        var seen = Set<UUID>()
+        for e in game.enemies {
+            seen.insert(e.id)
+            let n: SKSpriteNode
+            if let ex = enemyNodes[e.id] { n = ex } else {
+                n = SKSpriteNode(); n.anchorPoint = CGPoint(x: 0.5, y: 0); n.zPosition = 9
+                let bar = SKSpriteNode(color: SKColor(red: 0.9, green: 0.3, blue: 0.3, alpha: 1), size: CGSize(width: 16, height: 2)); bar.name = "bar"; bar.anchorPoint = CGPoint(x: 0, y: 0.5)
+                let barBg = SKSpriteNode(color: .black, size: CGSize(width: 18, height: 4)); barBg.name = "barbg"; barBg.anchorPoint = CGPoint(x: 0, y: 0.5)
+                n.addChild(barBg); n.addChild(bar)
+                entityNode.addChild(n); enemyNodes[e.id] = n
+            }
+            n.position = scenePos(e.x, e.y + e.h)
+            n.xScale = e.face < 0 ? -1 : 1
+            n.alpha = e.hurt > 0 ? 0.55 : 1
+            switch e.type {
+            case .slime, .cave, .ice:
+                let ci = e.type == .slime ? 0 : (e.type == .cave ? 1 : 2)
+                n.texture = assets.slimeFrames[ci][e.ground ? 0 : 1]; n.size = CGSize(width: 24, height: 16)
+                n.yScale = e.ground ? 1 : 0.9
+            case .zombie:
+                n.texture = assets.zombieFrames[e.eatT > 0 ? 4 + Int(e.anim * 4) % 2 : Int(e.anim * 8) % 4]; n.size = CGSize(width: 26, height: 28)
+            case .bat:
+                n.texture = assets.batFrames[Int(e.anim * 14) % 2]; n.size = CGSize(width: 24, height: 14)
+            case .king:
+                // Breathes on the ground; stretched tall in the air, since the sheet has no leap pose.
+                n.texture = assets.kingFrames[e.ground ? Int(e.anim * 3) % assets.kingFrames.count : 0]
+                n.size = CGSize(width: 72 * e.drawScale * (e.ground ? 1 : 0.92), height: 66 * e.drawScale * (e.ground ? 1 : 1.1))
+                if let f = e.lordFloor {
+                    let c = Reign.tint(f); n.color = SKColor(red: CGFloat(c.r) / 255, green: CGFloat(c.g) / 255, blue: CGFloat(c.b) / 255, alpha: 1); n.colorBlendFactor = 0.45
+                } else { n.colorBlendFactor = 0 }
+            }
+            let showBar = e.hp < e.maxhp && !e.boss
+            if let bar = n.childNode(withName: "bar") as? SKSpriteNode, let bg = n.childNode(withName: "barbg") as? SKSpriteNode {
+                bar.isHidden = !showBar; bg.isHidden = !showBar
+                let top = n.size.height + 5
+                bg.position = CGPoint(x: -9, y: top); bar.position = CGPoint(x: -8, y: top)
+                bar.size.width = 16 * CGFloat(e.hp) / CGFloat(e.maxhp)
+                bar.xScale = n.xScale; bg.xScale = n.xScale
+            }
+        }
+        // turrets: lantern turrets, rebuilt when the number changes; the lens glows up before a shot and flashes on it
+        let turrets = game.defense?.turrets ?? []
+        if turretNodes.count != turrets.count {
+            turretNodes.forEach { $0.removeFromParent() }; turretNodes = []
+            for t in turrets {
+                let n = SKSpriteNode(texture: assets.turretFrames[0]); n.size = CGSize(width: 16, height: 24); n.anchorPoint = CGPoint(x: 0.5, y: 0); n.zPosition = 8
+                n.position = scenePos(Double(t.x) + 0.5, Double(t.y) + 1)
+                entityNode.addChild(n); turretNodes.append(n)
+            }
+        }
+        for (i, t) in turrets.enumerated() where i < turretNodes.count {
+            (turretNodes[i] as? SKSpriteNode)?.texture = assets.turretFrames[t.cooldown > 0.65 ? 2 : (t.cooldown < 0.25 ? 1 : 0)]
+        }
+        for (id, n) in enemyNodes where !seen.contains(id) { n.removeFromParent(); enemyNodes[id] = nil }
+
+        // drops
+        var seenD = Set<UUID>()
+        for d in game.drops {
+            seenD.insert(d.uid)
+            let n: SKSpriteNode
+            if let ex = dropNodes[d.uid] { n = ex } else {
+                n = SKSpriteNode(texture: assets.itemTexture(d.id)); n.size = CGSize(width: 10, height: 10); n.zPosition = 8
+                entityNode.addChild(n); dropNodes[d.uid] = n
+            }
+            let bob = CGFloat(sin(d.t * 4)) * 1.5
+            n.position = CGPoint(x: CGFloat(d.x) * TILE_PX, y: -CGFloat(d.y + d.h / 2) * TILE_PX + bob)
+        }
+        for (id, n) in dropNodes where !seenD.contains(id) { n.removeFromParent(); dropNodes[id] = nil }
+
+        // arrows
+        var seenA = Set<UUID>()
+        for a in game.arrows {
+            seenA.insert(a.uid)
+            let n: SKSpriteNode
+            if let ex = arrowNodes[a.uid] { n = ex } else {
+                n = SKSpriteNode(texture: assets.itemTexture(Item.arrow)); n.size = CGSize(width: 14, height: 14); n.zPosition = 8
+                entityNode.addChild(n); arrowNodes[a.uid] = n
+            }
+            n.position = scenePos(a.x, a.y)
+            n.zRotation = CGFloat(atan2(-a.vy, a.vx)) - .pi / 4
+        }
+        for (id, n) in arrowNodes where !seenA.contains(id) { n.removeFromParent(); arrowNodes[id] = nil }
+
+        // floating text
+        var seenF = Set<UUID>()
+        for f in game.floats {
+            seenF.insert(f.uid)
+            let n: SKLabelNode
+            if let ex = floatNodes[f.uid] { n = ex } else {
+                n = SKLabelNode(fontNamed: HUD.fontBold); n.fontSize = 7; n.zPosition = 60
+                n.text = f.text; n.fontColor = SKColor(red: CGFloat(f.color.r) / 255, green: CGFloat(f.color.g) / 255, blue: CGFloat(f.color.b) / 255, alpha: 1)
+                fxNode.addChild(n); floatNodes[f.uid] = n
+            }
+            n.position = scenePos(f.x, f.y - 0.3); n.alpha = CGFloat(min(1, f.t))
+        }
+        for (id, n) in floatNodes where !seenF.contains(id) { n.removeFromParent(); floatNodes[id] = nil }
+    }
+
+    func syncParticles() {
+        let ps = game.particles
+        while particleNodes.count < ps.count {
+            let n = SKSpriteNode(texture: assets.pixel); n.size = CGSize(width: 3, height: 3); n.colorBlendFactor = 1; n.zPosition = 7
+            fxNode.addChild(n); particleNodes.append(n)
+        }
+        for (i, n) in particleNodes.enumerated() {
+            if i < ps.count {
+                let p = ps[i]
+                n.isHidden = false
+                n.position = scenePos(p.x, p.y)
+                n.color = SKColor(red: CGFloat(p.color.r) / 255, green: CGFloat(p.color.g) / 255, blue: CGFloat(p.color.b) / 255, alpha: 1)
+                n.size = p.snow ? CGSize(width: 2, height: 2) : CGSize(width: 3, height: 3)
+                n.alpha = CGFloat(min(1, p.t / max(0.01, p.life) * 2))
+            } else { n.isHidden = true }
+        }
+        if particleNodes.count > 600 { for n in particleNodes[600...] { n.removeFromParent() }; particleNodes.removeLast(particleNodes.count - 600) }
+    }
+
+    /// Overlays showing the truth behind light-gated tiles, faded in by the light channel that reveals them.
+    func syncReveals(x0: Int, y0: Int, x1: Int, y1: Int) {
+        let w = game.world, L = game.light
+        var seen = Set<Int>()
+        for y in max(0, y0)...min(w.h - 1, y1) {
+            for x in max(0, x0)...min(w.w - 1, x1) {
+                let t = w.get(x, y)
+                guard t == Tile.hiddenVein || t == Tile.ghostStone || t == Tile.tideWall else { continue }
+                let i = y * w.w + x
+                var a: CGFloat = 0
+                switch t {
+                case Tile.hiddenVein: a = CGFloat(Int(L.r[i]) - 6) / 4
+                case Tile.ghostStone: a = CGFloat(min(Int(L.r[i]), Int(L.b[i])) - 5) / 4
+                default: a = CGFloat(Int(L.b[i]) - 6) / 4
+                }
+                a = max(0, min(1, a))
+                if a <= 0.02 { continue }
+                seen.insert(i)
+                let n: SKSpriteNode
+                if let ex = revealNodes[i] { n = ex } else {
+                    n = SKSpriteNode(); n.size = CGSize(width: 16, height: 16); n.anchorPoint = CGPoint(x: 0, y: 1); n.zPosition = 3
+                    n.position = scenePos(Double(x), Double(y))
+                    if t == Tile.hiddenVein {
+                        let ore = y >= Layers.darkTop ? Tile.diamondOre : Tile.gold
+                        if let img = assets.tile(ore, col: w.autotileMask(x, y, Tile.stone) * 2) { n.texture = SKTexture(cgImage: img); n.texture?.filteringMode = .nearest }
+                    } else {
+                        if let img = assets.wall(kind: 1, variant: (x * 7 + y * 13) & 3) { n.texture = SKTexture(cgImage: img); n.texture?.filteringMode = .nearest }
+                        n.color = t == Tile.ghostStone ? SKColor(red: 0.8, green: 0.6, blue: 1, alpha: 1) : SKColor(red: 0.6, green: 0.85, blue: 1, alpha: 1)
+                        n.colorBlendFactor = 0.35
+                    }
+                    fxNode.addChild(n); revealNodes[i] = n
+                }
+                n.alpha = a
+            }
+        }
+        for (k, n) in revealNodes where !seen.contains(k) { n.removeFromParent(); revealNodes[k] = nil }
+    }
+
+    func npcLine(_ i: Int) -> String {
+        let lines = [
+            ["대장장이: 붉은 빛이 돌을 데우면 그 속의 금이 보인다고 하더군.", "대장장이: 용암 옆에 서려면 붉은 빛을 들어. 그게 전부야."],
+            ["원예사: 초록 빛 아래선 덩굴이 벽을 타고 자라. 길이 없으면 길을 키워.", "원예사: 병 속 이끼가 젖어 있어야 해. 물을 찾아."],
+            ["우물지기: 물의 층엔 벽처럼 선 물이 있어. 푸른 빛이면 지나갈 수 있지.", "우물지기: 옛 사람들은 하늘이 '내려갔다'고 했어. 올라간 게 아니라."],
+        ]
+        let set = lines[i % 3]
+        return set[Int(game.storyT / 7) % set.count]
+    }
+
+    /// Camp NPCs appear beside lit pedestals; the core sprite sits in the city.
+    func syncStoryNodes() {
+        let w = game.world
+        for (i, p) in w.pedestals.enumerated() {
+            let lit = (w.pedestalState["\(p.x),\(p.y)"] ?? 0) > 0
+            if lit && npcNodes[i] == nil {
+                let n = SKSpriteNode(texture: assets.playerFrames[0][0]); n.size = CGSize(width: 20, height: 32); n.anchorPoint = CGPoint(x: 0.5, y: 0)
+                n.color = [SKColor(red: 0.9, green: 0.5, blue: 0.3, alpha: 1), SKColor(red: 0.5, green: 0.8, blue: 0.4, alpha: 1), SKColor(red: 0.4, green: 0.6, blue: 0.9, alpha: 1)][i % 3]
+                n.colorBlendFactor = 0.45; n.name = "npc:\(i)"; n.zPosition = 8
+                n.position = scenePos(Double(p.x) + 1.9, Double(p.y) + 1)
+                n.xScale = -1
+                let bob = SKAction.repeatForever(SKAction.sequence([SKAction.moveBy(x: 0, y: 1, duration: 0.9), SKAction.moveBy(x: 0, y: -1, duration: 0.9)]))
+                n.run(bob)
+                entityNode.addChild(n); npcNodes[i] = n
+            }
+        }
+        coreNode.position = scenePos(Double(w.coreX) + 0.5, Double(w.coreY) + 1)
+        coreNode.texture = assets.coreFrames[game.act >= 3 ? 1 : 0]
+        coreNode.isHidden = abs(Double(w.coreX) - game.player.x) > 60
+        if game.act >= 3 { coreNode.alpha = 0.85 + CGFloat(sin(game.storyT * 3)) * 0.15 }
+        // the jar's glow around the player
+        let l = game.jar.light
+        jarGlow.position = CGPoint(x: playerNode.position.x, y: playerNode.position.y + 14)
+        jarGlow.color = SKColor(red: CGFloat(l.r) / 15, green: CGFloat(l.g) / 15, blue: CGFloat(l.b) / 15, alpha: 1)
+        jarGlow.alpha = CGFloat(0.12 + Double(game.jar.brightness) / 15 * 0.25) * CGFloat(game.jarDim)
+        jarGlow.setScale(1 + CGFloat(sin(game.storyT * 2.2)) * 0.05)
+        jarGlow.isHidden = game.player.dead > 0
+    }
+
+    func updateCursor(_ wm: (x: Double, y: Double)) {
+        let tx = Int(floor(wm.x)), ty = Int(floor(wm.y))
+        cursorNode.isHidden = paused_ || hud.panelOpen
+        cursorNode.position = CGPoint(x: CGFloat(tx) * TILE_PX + 8, y: -CGFloat(ty) * TILE_PX - 8)
+        cursorNode.color = game.reach(tx, ty) ? .white : SKColor(red: 1, green: 0.35, blue: 0.35, alpha: 1)
+        cursorNode.colorBlendFactor = 1
+        if let m = game.mineTarget, game.mineProg > 0 {
+            crackNode.alpha = (CGFloat(game.mineProg) * 0.55 + digKick * 0.3)
+            crackNode.position = CGPoint(x: CGFloat(m.x) * TILE_PX + 8 + digKick * CGFloat.random(in: -1.5...1.5), y: -CGFloat(m.y) * TILE_PX - 8 + digKick * CGFloat.random(in: -1.5...1.5))
+        } else { crackNode.alpha = 0 }
+    }
+}
