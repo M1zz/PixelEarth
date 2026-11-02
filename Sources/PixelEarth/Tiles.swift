@@ -147,7 +147,7 @@ let ITEMS: [Int: ItemDef] = [
     Item.ironSword: ItemDef(name: "철 검", tool: .sword, dmg: 22),
     Item.goldSword: ItemDef(name: "금 검", tool: .sword, dmg: 34),
     Item.diamondSword: ItemDef(name: "다이아 검", tool: .sword, dmg: 52),
-    Item.gel: ItemDef(name: "젤"), Item.ironBar: ItemDef(name: "철 주괴"), Item.goldBar: ItemDef(name: "금 주괴"), Item.diamond: ItemDef(name: "다이아몬드"),
+    Item.gel: ItemDef(name: "빛벌레"), Item.ironBar: ItemDef(name: "철 주괴"), Item.goldBar: ItemDef(name: "금 주괴"), Item.diamond: ItemDef(name: "다이아몬드"),
     Item.potion: ItemDef(name: "치유 물약", use: .heal),
     Item.bow: ItemDef(name: "활", tool: .bow, dmg: 16), Item.arrow: ItemDef(name: "화살"),
     Item.crown: ItemDef(name: "옛 왕관"),
@@ -163,37 +163,26 @@ func itemStackable(_ id: Int) -> Bool { id < 100 ? true : (ITEMS[id]?.stackable 
 struct ItemStack: Codable, Equatable { var id: Int; var n: Int }
 
 struct Recipe { let cat: String; let out: Int; let n: Int; let input: [(Int, Int)]; let bench: Bool }
-let CRAFT_CATS = ["기본", "빛", "도구", "무기", "갑옷", "재료"]
+let CRAFT_CATS = ["기본", "빛", "무기", "재료"]
+/// No pickaxe, sword or armor ladder: the hands dig and fight with the jar's light (see Game.heldStats),
+/// and light is grown from spores rather than burned from coal.
 let RECIPES: [Recipe] = [
     Recipe(cat: "기본", out: Tile.plank, n: 4, input: [(Tile.wood, 1)], bench: false),
-    Recipe(cat: "기본", out: Tile.torch, n: 4, input: [(Tile.wood, 1), (Tile.coal, 1)], bench: false),
     Recipe(cat: "기본", out: Tile.bench, n: 1, input: [(Tile.plank, 6)], bench: false),
     Recipe(cat: "기본", out: Tile.platform, n: 4, input: [(Tile.plank, 2)], bench: false),
     Recipe(cat: "기본", out: Tile.door, n: 1, input: [(Tile.plank, 6)], bench: true),
-    Recipe(cat: "기본", out: Tile.glass, n: 4, input: [(Tile.sand, 4), (Tile.coal, 1)], bench: false),
     Recipe(cat: "기본", out: Tile.brick, n: 4, input: [(Tile.stone, 4)], bench: false),
     Recipe(cat: "기본", out: Tile.stonewall, n: 4, input: [(Tile.stone, 2), (Tile.dirt, 2)], bench: false),
-    Recipe(cat: "기본", out: Tile.lantern, n: 2, input: [(Tile.glass, 1), (Tile.torch, 2)], bench: true),
-    Recipe(cat: "빛", out: Tile.vine, n: 6, input: [(Tile.greenSpore, 1), (Tile.wood, 2)], bench: false),
-    Recipe(cat: "빛", out: Tile.redPlant, n: 1, input: [(Tile.redSpore, 2), (Tile.dirt, 2)], bench: false),
+    Recipe(cat: "기본", out: Tile.glass, n: 4, input: [(Tile.sand, 4), (Tile.coal, 1)], bench: false),
+    // Charcoal: coal ore is buried and dark, so wood is always enough for glass and lamps.
+    Recipe(cat: "기본", out: Tile.coal, n: 1, input: [(Tile.wood, 2)], bench: true),
     Recipe(cat: "빛", out: Tile.greenPlant, n: 1, input: [(Tile.greenSpore, 2), (Tile.dirt, 2)], bench: false),
+    Recipe(cat: "빛", out: Tile.redPlant, n: 1, input: [(Tile.redSpore, 2), (Tile.dirt, 2)], bench: false),
     Recipe(cat: "빛", out: Tile.bluePlant, n: 1, input: [(Tile.blueSpore, 2), (Tile.dirt, 2)], bench: false),
-    Recipe(cat: "도구", out: Item.woodPick, n: 1, input: [(Tile.plank, 8)], bench: true),
-    Recipe(cat: "도구", out: Item.stonePick, n: 1, input: [(Tile.stone, 10), (Tile.plank, 4)], bench: true),
-    Recipe(cat: "도구", out: Item.ironPick, n: 1, input: [(Item.ironBar, 6), (Tile.plank, 4)], bench: true),
-    Recipe(cat: "도구", out: Item.goldPick, n: 1, input: [(Item.goldBar, 6), (Tile.plank, 4)], bench: true),
-    Recipe(cat: "도구", out: Item.diamondPick, n: 1, input: [(Item.diamond, 4), (Item.goldBar, 2), (Tile.plank, 4)], bench: true),
-    Recipe(cat: "무기", out: Item.woodSword, n: 1, input: [(Tile.plank, 10)], bench: true),
-    Recipe(cat: "무기", out: Item.ironSword, n: 1, input: [(Item.ironBar, 8), (Tile.plank, 3)], bench: true),
-    Recipe(cat: "무기", out: Item.goldSword, n: 1, input: [(Item.goldBar, 8), (Tile.plank, 3)], bench: true),
-    Recipe(cat: "무기", out: Item.diamondSword, n: 1, input: [(Item.diamond, 5), (Item.goldBar, 3), (Tile.plank, 3)], bench: true),
+    Recipe(cat: "빛", out: Tile.lantern, n: 1, input: [(Tile.glass, 2), (Tile.coal, 1)], bench: true),
+    Recipe(cat: "빛", out: Tile.vine, n: 6, input: [(Tile.greenSpore, 1), (Tile.wood, 2)], bench: false),
     Recipe(cat: "무기", out: Item.bow, n: 1, input: [(Tile.plank, 6), (Item.gel, 3)], bench: true),
     Recipe(cat: "무기", out: Item.arrow, n: 8, input: [(Tile.plank, 1), (Tile.stone, 1)], bench: false),
-    Recipe(cat: "재료", out: Item.ironBar, n: 1, input: [(Tile.iron, 3), (Tile.coal, 1)], bench: true),
-    Recipe(cat: "재료", out: Item.goldBar, n: 1, input: [(Tile.gold, 3), (Tile.coal, 2)], bench: true),
     Recipe(cat: "재료", out: Item.potion, n: 1, input: [(Item.gel, 3), (Tile.leaves, 5)], bench: false),
     Recipe(cat: "재료", out: Item.lightShard, n: 1, input: [(Item.diamond, 1), (Tile.crystal, 3)], bench: true),
-    Recipe(cat: "갑옷", out: Item.ironArmor, n: 1, input: [(Item.ironBar, 12)], bench: true),
-    Recipe(cat: "갑옷", out: Item.goldArmor, n: 1, input: [(Item.goldBar, 12)], bench: true),
-    Recipe(cat: "갑옷", out: Item.diamondArmor, n: 1, input: [(Item.diamond, 8), (Item.goldBar, 4)], bench: true),
 ]

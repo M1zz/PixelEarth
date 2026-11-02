@@ -94,7 +94,7 @@ extension World {
         case 6:     // the east wall of names, and the veins it hid
             for i in stride(from: 3, to: 42, by: 3) { set(at(i), y - 5, i % 2 == 0 ? Tile.gold : Tile.iron) }
             for i in [10, 26] { set(at(i), y - 2, Tile.lantern) }
-            chests["\(far),\(y)"] = [ItemStack(id: Item.goldBar, n: 6), ItemStack(id: Tile.redSpore, n: 4), ItemStack(id: Item.lightShard, n: 1)]
+            chests["\(far),\(y)"] = [ItemStack(id: Tile.gold, n: 6), ItemStack(id: Tile.redSpore, n: 4), ItemStack(id: Item.lightShard, n: 1)]
         case 7:     // the house past the veil
             for i in 6...16 { set(at(i), y, Tile.water) }
             for i in [18, 36] { set(at(i), y, Tile.bluePlant) }
@@ -102,12 +102,12 @@ extension World {
             chests["\(far),\(y)"] = [ItemStack(id: Item.potion, n: 5), ItemStack(id: Tile.blueSpore, n: 4), ItemStack(id: Item.lightShard, n: 1)]
         case 8:     // the singing dark: no lamps at all, only mushrooms
             for i in stride(from: 5, to: 40, by: 7) { set(at(i), y, Tile.shroom) }
-            chests["\(far),\(y)"] = [ItemStack(id: Item.diamond, n: 4), ItemStack(id: Tile.torch, n: 20), ItemStack(id: Item.lightShard, n: 1)]
+            chests["\(far),\(y)"] = [ItemStack(id: Item.diamond, n: 4), ItemStack(id: Tile.lantern, n: 3), ItemStack(id: Item.lightShard, n: 1)]
         default:    // the painted sky
             for i in 0...44 { set(at(i), y - 5, Tile.glass) }
             // lamps die this deep, so mushrooms light the painting
             for i in stride(from: 3, to: 44, by: 6) { set(at(i), y, Tile.shroom) }
-            chests["\(far),\(y)"] = [ItemStack(id: Item.diamond, n: 6), ItemStack(id: Item.goldBar, n: 6), ItemStack(id: Item.lightShard, n: 2)]
+            chests["\(far),\(y)"] = [ItemStack(id: Item.diamond, n: 6), ItemStack(id: Tile.gold, n: 6), ItemStack(id: Item.lightShard, n: 2)]
         }
         set(far, y, Tile.chest)
     }

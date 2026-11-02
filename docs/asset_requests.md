@@ -14,7 +14,98 @@ no checkerboard pattern, no ground shadow, no text, no watermark, no signature
 - 투명 배경이 가장 중요합니다. 체커무늬가 그려진 배경은 지우기 어렵습니다. 투명이 안 되면 단색 마젠타(#FF00FF) 배경이 가장 좋습니다.
 - 크기는 게임 픽셀의 정확한 배수(예: 8배)로 받으면 축소할 때 픽셀이 뭉개지지 않습니다.
 
-## 1순위
+## 0순위 — 새 세계 '나엘'의 겉모습
+
+세계관이 별을 잃은 행성 나엘로 바뀌었습니다(`docs/STORY.md` 0절). 해가 없고, 하늘은 땅 밑 심장에서 올라온 청록·보랏빛 **빛안개**입니다.
+하늘색과 해 없애기는 코드로 이미 바꿨고, 아래 그림이 오면 지상이 지구처럼 보이지 않게 됩니다. 크기는 지금 파일과 같아서 받으면 이름 그대로 바꿔 끼우면 됩니다.
+
+모든 그림에 위 공통 문장과 함께 이 문장도 붙여 주세요.
+
+```
+alien rogue planet with no sun, the sky lit from below by drifting teal and violet aurora mist,
+muted cold palette with teal, violet and pale gold accents, nothing that looks like Earth
+```
+
+### N1. 빛안개 커튼 (구름 자리) — `clouds.png`
+192×32px, 64×32 조각 3개 가로 한 줄. 하늘에 천천히 흘러가며 겹쳐 보입니다. 거의 흰색으로 그리면 코드에서 밝기를 조절합니다.
+
+```
+3 separate floating wisps of glowing aurora mist for a 2D pixel art sky, each 64x32 pixels in one row,
+soft vertical curtain shapes with wavy hanging edges, pale near-white with faint teal tint,
+semi-transparent dithered edges made of hard pixels, no clouds, no fluffy cumulus shapes.
+```
+
+### N2. 먼 지형 두 겹 — `mountains0.png`, `mountains1.png`
+각 512×160px, 좌우가 이음새 없이 이어져야 합니다. 0번은 먼 겹(높고 흐릿), 1번은 가까운 겹(낮고 진함). 한 가지 회청색으로만 그리면 코드가 낮밤에 맞춰 물들입니다.
+
+```
+Seamless horizontally tiling background silhouette layer for a 2D pixel art side-scroller, 512x160 pixels,
+an alien horizon: tall leaning spires of crystal rock, broken arches, and thin mesas,
+a few faint glowing cracks in the rock, single flat grey-blue colour with one lighter shade for edges,
+transparent sky above, bottom edge fully filled.
+Make two versions: (A) distant layer, taller and sparser spires; (B) near layer, lower rolling crystal ridges.
+```
+
+### N3. 별하늘 — `stars.png`
+256×128px, 이어 붙일 수 있게. 빛안개가 어두워지는 밤에 보입니다.
+
+```
+Seamless tiling night sky of a starless-sun rogue planet, 256x128 pixel art,
+dense field of tiny cold white and blue stars of 1-2 pixels, a faint band of distant galaxy,
+very dark navy background, no moon, no planets.
+```
+
+### N4. 지상 식생 — `surface_tiles.png`
+16×16px 타일 6개 가로 한 줄. 순서대로: 풀 덮인 흙 윗면, 흙, 나무 줄기, 나뭇잎 덩어리, 나뭇잎 가장자리, 작은 꽃. 받으면 `tiles.png` 해당 칸에 옮기는 변환은 코드 쪽에서 합니다.
+
+```
+A row of 6 tiles for a 2D pixel art alien planet, each 16x16 pixels, seamless where they repeat:
+1) dark violet soil topped with short teal glowing moss, 2) plain dark violet-brown soil,
+3) a pale bone-white tree trunk with faint glowing veins, 4) a dense clump of drooping teal-blue leaves with tiny glowing tips,
+5) the edge of that leaf clump fading out, 6) a small alien flower with a pale gold glowing bulb.
+```
+
+### N5. 물렁이 (지상의 작은 적) — `slimes.png`
+144×16px, 24×16 프레임 6개: 색 3가지 × 2프레임(제자리, 눌림). 지금은 슬라임 그림입니다.
+
+```
+Sprite sheet of a small alien blob creature for a 2D pixel art game, 6 frames of 24x16 pixels in one row:
+3 colour variants (teal, violet, pale gold), each with 2 frames (resting, squashed mid-hop).
+A translucent jelly body with a glowing core seed inside and three tiny feeler stalks on top, no face.
+```
+
+### N6. 날개막 (동굴의 날짐승) — `bat.png`
+48×14px, 24×14 프레임 2개(날개 위, 날개 아래). 지금은 박쥐 그림입니다.
+
+```
+Sprite sheet of a small alien cave flier for a 2D pixel art game, 2 frames of 24x14 pixels in one row
+(wings up, wings down). A thin translucent membrane like a manta ray with a single glowing pale eye in the middle,
+dark violet body, faint teal glow along the wing edges, no feathers, no bat ears.
+```
+
+### N7. 앱 아이콘 다시 — `app_icon.png`
+1024×1024px, 글자 없이. 지금 아이콘은 지구 동굴 느낌이라 나엘에 맞춥니다.
+
+```
+App icon, pixel art style, 1024x1024. A small glass jar held up on the dark surface of an alien planet,
+a handful of teal and violet aurora mist breathing inside the jar, above it a dark sky where the aurora is being
+pulled down into a glowing crack in the ground, strong silhouette readable at small sizes, no text, no border.
+```
+
+### N8. 그림 하늘 천장 다시 — `painted_sky.png`
+64×48px 1장(지금 `decor.png`의 그림 하늘 자리와 같은 크기), 좌우 이음새 없이. 9층 아이들이 천장에 칠한 '하늘'입니다. 나엘의 하늘은 빛안개라 파란 하늘과 구름이면 안 됩니다.
+
+```
+A ceiling painting for a 2D underground pixel art game, 64x48 pixels, seamless horizontally,
+a child's naive painting of teal and violet aurora curtains made with coloured stone dust on dark rock,
+uneven brush strokes, one curtain fold still wet and shiny, a tiny handprint at the bottom edge, no clouds, no blue sky.
+```
+
+## 받은 것 (적용 끝)
+
+아래 1~6은 두 번째 묶음으로 받아 게임에 넣었습니다. 7번 이후는 아직 필요합니다.
+
+### 1순위
 
 ### 1. 왕좌지기 (층의 주인) — `keeper.png`
 게임 크기 72×66px, 4프레임 가로 한 줄(8배면 프레임당 576×528). 가면, 망토 어깨, 가슴의 빛은 거의 흰색으로 그려야 게임에서 층마다 다른 색으로 물듭니다.
@@ -61,7 +152,7 @@ A squat carved stone pedestal topped by an iron lantern with a lens that shoots 
 Each frame 16x24 pixels.
 ```
 
-## 2순위
+### 2순위
 
 ### 5. 곁굴 장식 타일 — `passage_tiles.png`
 16×16px 타일 7개 가로 한 줄. 순서대로: 이름이 새겨진 벽 A, 이름이 새겨진 벽 B, 손톱 자국 세 줄이 난 벽, 마른 약초 묶음, 침상 왼쪽, 침상 오른쪽, 푸른 돌가루로 칠한 천장(이어 붙여도 이음새가 없게).

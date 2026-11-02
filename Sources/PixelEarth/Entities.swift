@@ -129,5 +129,5 @@ func moveEntity(_ e: Entity, _ world: World, _ dt: Double) {
     let mid = world.get(Int(floor(e.x)), Int(floor(e.y + e.h * 0.5)))
     e.inWater = mid == Tile.water
     e.inLava = mid == Tile.lava || world.get(Int(floor(e.x)), Int(floor(e.y + e.h - 0.1))) == Tile.lava
-    if e.inWater { e.vy *= 0.86; if e.vy > 4 { e.vy = 4 } }
+    if e.inWater { e.vy *= pow(0.86, dt * 60); if e.vy > 4 { e.vy = 4 } }   // per second, not per frame: same feel at 60 or 120 Hz
 }

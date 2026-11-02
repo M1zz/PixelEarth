@@ -24,29 +24,29 @@ extension Game {
     private func holdHint(_ id: Int) -> KeyHint? {
         if player.held?.id == id { return nil }
         guard let i = player.inv.firstIndex(where: { $0?.id == id }) else { return nil }
-        if i < 9 { return KeyHint(symbol: HintSymbol.hold, key: slotKey(i), text: String(format: L("hint.holdItem"), itemName(id)), urgent: true) }
+        if i < Game.handSlots { return KeyHint(symbol: HintSymbol.hold, key: slotKey(i), text: String(format: L("hint.holdItem"), itemName(id)), urgent: true) }
         return KeyHint(symbol: HintSymbol.bag, key: "I", text: String(format: L("hint.findInBag"), itemName(id)), urgent: true)
     }
 
     private func tutorialHints() -> [KeyHint] {
         guard act == 1, !disasterStruck else { return [] }
         switch tutorialStep {
+        case Tutorial.look: return [hint(HintSymbol.jar, "J", "hint.jar", urgent: true)]
         case Tutorial.walk: return [hint(HintSymbol.move, "key.ad", "hint.move", urgent: true)]
         case Tutorial.jump: return [hint(HintSymbol.jump, "key.space", "hint.jump", urgent: true)]
-        case Tutorial.chop:
-            return [player.held?.id == Item.woodPick ? hint(HintSymbol.mine, "key.lmb", "hint.mineHold", urgent: true) : holdHint(Item.woodPick)].compactMap { $0 }
-        case Tutorial.planks: return [hint(HintSymbol.craft, "E", "hint.craft", urgent: true)]
-        case Tutorial.bench:
-            if countItem(Tile.bench) == 0 { return [hint(HintSymbol.craft, "E", "hint.craft", urgent: true)] }
-            return [player.held?.id == Tile.bench ? hint(HintSymbol.place, "key.rmb", "hint.place", urgent: true) : holdHint(Tile.bench)].compactMap { $0 }
-        case Tutorial.sword: return [hint(HintSymbol.craft, "E", "hint.craft", urgent: true)]
-        case Tutorial.slime:
-            return [player.held?.id == Item.woodSword ? hint(HintSymbol.attack, "key.lmb", "hint.attack", urgent: true) : holdHint(Item.woodSword)].compactMap { $0 }
+        case Tutorial.follow: return [hint(HintSymbol.move, "key.ad", "hint.follow", urgent: true)]
         case Tutorial.feed:
-            return [player.held?.id == Item.gel ? hint(HintSymbol.feed, "F", "hint.feed", urgent: true) : holdHint(Item.gel)].compactMap { $0 }
-        case Tutorial.look: return [hint(HintSymbol.jar, "J", "hint.jar", urgent: true)]
+            return [player.held?.id == Tile.greenSpore ? hint(HintSymbol.feed, "F", "hint.feed", urgent: true) : holdHint(Tile.greenSpore)].compactMap { $0 }
+        case Tutorial.cover: return [hint(HintSymbol.jar, "C", jarCovered ? "hint.uncover" : "hint.cover", urgent: true)]
         default: return []
         }
+    }
+
+    /// Something that hunts by light is near: hiding the jar is an option. Once hidden, how to bring it back.
+    private func coverHints() -> [KeyHint] {
+        if jarCovered { return [hint(HintSymbol.jar, "C", "hint.uncover")] }
+        let near = enemies.contains { $0.lordFloor == nil && $0.attackerCost == 0 && hypot($0.x - player.x, $0.y - player.y) < 12 }
+        return near ? [hint(HintSymbol.jar, "C", "hint.cover")] : []
     }
 
     /// What can be done with whatever is under the cursor.
@@ -76,7 +76,6 @@ extension Game {
     private func heldHints() -> [KeyHint] {
         guard let s = player.held else { return [] }
         var out: [KeyHint] = []
-        if heldStats().tool == .pick { out.append(hint("arrow.up.and.down", "key.ws", "hint.look")) }
         if s.id < 100, TILES[s.id].placeable { out.append(hint(HintSymbol.place, "key.rmb", "hint.place")) }
         if let it = ITEMS[s.id] {
             if it.use != nil { out.append(hint(HintSymbol.use, "key.lmb", "hint.use")) }
@@ -116,7 +115,7 @@ extension Game {
         if !craftOpened, RECIPES.contains(where: { !$0.bench && canCraft($0, bench: false) }) {
             out.append(hint(HintSymbol.craft, "E", "hint.craft", urgent: true))
         }
-        out += movementHints() + targetHints() + heldHints()
+        out += coverHints() + movementHints() + targetHints() + heldHints()
         var seen: [KeyHint] = []
         for h in out where !seen.contains(where: { $0.key == h.key && $0.text == h.text }) { seen.append(h) }
         return Array(seen.prefix(5))

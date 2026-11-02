@@ -18,7 +18,7 @@ final class GameScene: SKScene {
     // background pieces
     var skyNode = SKSpriteNode()
     var starsNode = SKSpriteNode()
-    var sunNode = SKSpriteNode(), moonNode = SKSpriteNode()
+    var moonNode = SKSpriteNode()
     var mountainsA: [SKSpriteNode] = [], mountainsB: [SKSpriteNode] = []
     var cloudNodes: [SKSpriteNode] = []
     var cloudOffsets: [CGFloat] = []
@@ -43,6 +43,10 @@ final class GameScene: SKScene {
     let crownNode = SKSpriteNode()
     var turretNodes: [SKSpriteNode] = []
     let crackNode = SKSpriteNode()
+    let placeGhost = SKSpriteNode()     // keyboard play: where L will put the held block
+    /// Each floor below has one color of its own; everything is multiplied by it, so a floor reads at a glance.
+    let gradeNode = SKSpriteNode(color: .white, size: CGSize(width: 4000, height: 4000))
+    private var grade = (r: CGFloat(1), g: CGFloat(1), b: CGFloat(1))
 
     // story / light-gate visuals
     var revealNodes: [Int: SKSpriteNode] = [:]
@@ -101,10 +105,12 @@ final class GameScene: SKScene {
         setupLighting()
         hud = HUD(scene: self)
         cam.addChild(hud.root)
+        gradeNode.blendMode = .multiply; gradeNode.zPosition = 500; gradeNode.alpha = 1
+        cam.addChild(gradeNode)
         applyZoom()
 
         game.onTileChanged = { [weak self] x, y in self?.chunkRenderer.invalidate(tileX: x, tileY: y); self?.lightDirty = true }
-        game.onSFX = { Sound.shared.play($0) }
+        let sound = Sound.shared; game.onSFX = { sound.play($0) }   // touching it starts the music
         game.onDigStrike = { [weak self] in guard let self = self else { return }; self.shake = max(self.shake, 0.1); self.digKick = 1 }
         game.onMessage = { [weak self] m in self?.hud.showMessage(m) }
         game.onTip = { [weak self] m in self?.hud.showTip(m) }
@@ -146,9 +152,8 @@ final class GameScene: SKScene {
         cam.addChild(skyNode)
         starsNode = SKSpriteNode(texture: assets.stars); starsNode.zPosition = -99; starsNode.alpha = 0
         cam.addChild(starsNode)
-        sunNode = SKSpriteNode(texture: assets.glow); sunNode.color = SKColor(red: 1, green: 0.93, blue: 0.6, alpha: 1); sunNode.colorBlendFactor = 1; sunNode.zPosition = -98; sunNode.size = CGSize(width: 90, height: 90)
         moonNode = SKSpriteNode(texture: assets.glow); moonNode.color = SKColor(red: 0.85, green: 0.9, blue: 1, alpha: 1); moonNode.colorBlendFactor = 1; moonNode.zPosition = -98; moonNode.size = CGSize(width: 60, height: 60)
-        cam.addChild(sunNode); cam.addChild(moonNode)
+        cam.addChild(moonNode)
         for i in 0..<4 {
             let a = SKSpriteNode(texture: assets.mountains0); a.anchorPoint = CGPoint(x: 0, y: 0); a.zPosition = -97; a.colorBlendFactor = 1
             let b = SKSpriteNode(texture: assets.mountains1); b.anchorPoint = CGPoint(x: 0, y: 0); b.zPosition = -96; b.colorBlendFactor = 1
@@ -185,6 +190,8 @@ final class GameScene: SKScene {
         fxNode.addChild(cursorNode)
         crackNode.texture = assets.pixel; crackNode.size = CGSize(width: 16, height: 16); crackNode.color = .black; crackNode.colorBlendFactor = 1; crackNode.alpha = 0; crackNode.zPosition = 5
         fxNode.addChild(crackNode)
+        placeGhost.size = CGSize(width: 16, height: 16); placeGhost.alpha = 0.45; placeGhost.zPosition = 49
+        fxNode.addChild(placeGhost)
         jarGlow.texture = assets.glow; jarGlow.size = CGSize(width: 70, height: 70); jarGlow.colorBlendFactor = 1; jarGlow.blendMode = .add; jarGlow.zPosition = 45; jarGlow.alpha = 0.35
         fxNode.addChild(jarGlow)
         coreNode.texture = assets.coreFrames[0]; coreNode.size = CGSize(width: 48, height: 48); coreNode.anchorPoint = CGPoint(x: 0.5, y: 0); coreNode.zPosition = 6
@@ -228,7 +235,7 @@ final class GameScene: SKScene {
 
     /// Physical key names, so shortcuts keep working with Korean or any other input source selected.
     private static let keyNames: [UInt16: String] = [
-        11: "b", 9: "v", 0: "a", 1: "s", 2: "d", 13: "w", 12: "q", 14: "e", 15: "r", 17: "t", 3: "f", 34: "i", 38: "j", 40: "k", 37: "l", 46: "m",
+        11: "b", 9: "v", 8: "c", 0: "a", 1: "s", 2: "d", 13: "w", 12: "q", 14: "e", 15: "r", 17: "t", 3: "f", 34: "i", 38: "j", 40: "k", 37: "l", 46: "m",
         18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9",
         123: "left", 124: "right", 126: "up", 125: "down", 49: "space", 36: "return", 76: "return",
     ]
@@ -245,13 +252,14 @@ final class GameScene: SKScene {
             if hud.handleNavKey(c) { return }
         }
         if paused_ { return }
-        if let d = Int(c), d >= 1 && d <= 9 { selectSlot(d - 1) }
+        if let d = Int(c), d >= 1 && d <= Game.handSlots { selectSlot(d - 1) }
         switch c {
         case "t": game.skipTutorial()
         case "e": hud.togglePanel(.craft)
         case "i": hud.togglePanel(.inventory)
         case "j": hud.togglePanel(.jar)
         case "r": hud.togglePanel(.reign)
+        case "c": game.toggleCover()
         case "b": game.buildTurret()
         case "v": game.buildWall()
         case "q": game.dropHeld()
@@ -296,7 +304,7 @@ final class GameScene: SKScene {
         if paused_ { return }
         let dy = event.scrollingDeltaY
         if abs(dy) < 0.5 { return }
-        selectSlot((game.player.sel + (dy < 0 ? 1 : 8)) % 9)
+        selectSlot((game.player.sel + (dy < 0 ? 1 : Game.handSlots - 1)) % Game.handSlots)
     }
 
     func pollMouse() {
@@ -345,6 +353,7 @@ final class GameScene: SKScene {
             lightDirty = false
         }
         updateBackground(dt)
+        updateGrade(dt)
         syncEntities(dt)
         syncParticles()
         if game.frame % 2 == 0 { syncReveals(x0: vx0, y0: vy0, x1: vx1, y1: vy1) }
@@ -386,16 +395,26 @@ final class GameScene: SKScene {
 
     // MARK: background
 
+    func updateGrade(_ dt: Double) {
+        let f = game.currentFloor
+        let want: (r: CGFloat, g: CGFloat, b: CGFloat) = [5: (0.86, 1, 0.88), 6: (1, 0.8, 0.76), 7: (0.78, 0.88, 1), 8: (0.84, 0.78, 1), 9: (1, 0.96, 0.86)][f] ?? (1, 1, 1)
+        let k = CGFloat(min(1, dt * 1.5))
+        grade = (grade.r + (want.r - grade.r) * k, grade.g + (want.g - grade.g) * k, grade.b + (want.b - grade.b) * k)
+        gradeNode.color = SKColor(red: grade.r, green: grade.g, blue: grade.b, alpha: 1)
+    }
+
     func updateBackground(_ dt: Double) {
         let dl = CGFloat(game.dayLight)
+        // Nael has no sun: the sky is skymist, teal when the heart beats strong, violet as it fades
         let dusk = max(0, 1 - abs(dl - 0.3) * 4)
-        let r = (12 + dl * 110 + dusk * 150) / 255, g = (16 + dl * 170 + dusk * 50) / 255, b = (38 + dl * 200) / 255
+        let r = (10 + dl * 40 + dusk * 90) / 255, g = (12 + dl * 150 + dusk * 30) / 255, b = (30 + dl * 140 + dusk * 80) / 255
         skyNode.color = SKColor(red: r, green: g, blue: b, alpha: 1)
         starsNode.alpha = max(0, (0.45 - dl) * 1.6)
         let w = size.width, h = size.height
         let ang = CGFloat(game.worldTime - 0.25) * .pi * 2
-        sunNode.position = CGPoint(x: cos(ang) * w * 0.45, y: sin(ang) * h * 0.55 - h * 0.1)
-        moonNode.position = CGPoint(x: -cos(ang) * w * 0.45, y: -sin(ang) * h * 0.55 - h * 0.1)
+        // the pale moon drifts slowly across, a little brighter when the mist dims
+        moonNode.position = CGPoint(x: -cos(ang * 0.5) * w * 0.4, y: h * 0.28 + sin(ang * 0.5) * h * 0.08)
+        moonNode.alpha = 0.5 + (1 - dl) * 0.5
         let camX = cam.position.x, camY = cam.position.y
         let mw: CGFloat = 768
         let tintA = SKColor(red: 0.25 + dl * 0.35, green: 0.3 + dl * 0.4, blue: 0.45 + dl * 0.45, alpha: 1)
@@ -615,7 +634,7 @@ final class GameScene: SKScene {
         let lines = [
             ["대장장이: 붉은 빛이 돌을 데우면 그 속의 금이 보인다고 하더군.", "대장장이: 용암 옆에 서려면 붉은 빛을 들어. 그게 전부야."],
             ["원예사: 초록 빛 아래선 덩굴이 벽을 타고 자라. 길이 없으면 길을 키워.", "원예사: 병 속 이끼가 젖어 있어야 해. 물을 찾아."],
-            ["우물지기: 물의 층엔 벽처럼 선 물이 있어. 푸른 빛이면 지나갈 수 있지.", "우물지기: 옛 사람들은 하늘이 '내려갔다'고 했어. 올라간 게 아니라."],
+            ["우물지기: 물의 층엔 벽처럼 선 물이 있어. 푸른 빛이면 지나갈 수 있지.", "우물지기: 옛 사람들은 하늘이 땅 밑에서 온다고 했어. 그래서 우리가 여기 있는 거야."],
         ]
         let set = lines[i % 3]
         return set[Int(game.storyT / 7) % set.count]
@@ -645,7 +664,7 @@ final class GameScene: SKScene {
         let l = game.jar.light
         jarGlow.position = CGPoint(x: playerNode.position.x, y: playerNode.position.y + 14)
         jarGlow.color = SKColor(red: CGFloat(l.r) / 15, green: CGFloat(l.g) / 15, blue: CGFloat(l.b) / 15, alpha: 1)
-        jarGlow.alpha = CGFloat(0.12 + Double(game.jar.brightness) / 15 * 0.25) * CGFloat(game.jarDim)
+        jarGlow.alpha = CGFloat(0.12 + Double(game.jar.brightness) / 15 * 0.25) * CGFloat(game.jarStrength)
         jarGlow.setScale(1 + CGFloat(sin(game.storyT * 2.2)) * 0.05)
         jarGlow.isHidden = game.player.dead > 0
     }
@@ -660,5 +679,12 @@ final class GameScene: SKScene {
             crackNode.alpha = (CGFloat(game.mineProg) * 0.55 + digKick * 0.3)
             crackNode.position = CGPoint(x: CGFloat(m.x) * TILE_PX + 8 + digKick * CGFloat.random(in: -1.5...1.5), y: -CGFloat(m.y) * TILE_PX - 8 + digKick * CGFloat.random(in: -1.5...1.5))
         } else { crackNode.alpha = 0 }
+        // K's target has the cursor; L's target differs (the nearest free tile), so show it as a faint copy of the block.
+        if game.input.keyboardAim, !cursorNode.isHidden, let s = game.player.held, s.id < 100, TILES[s.id].placeable {
+            let a = game.placeAim(), gx = Int(floor(a.x)), gy = Int(floor(a.y))
+            placeGhost.isHidden = !(game.reach(gx, gy) && [Tile.air, Tile.water].contains(game.world.get(gx, gy)))
+            placeGhost.texture = assets.itemTexture(s.id)
+            placeGhost.position = CGPoint(x: CGFloat(gx) * TILE_PX + 8, y: -CGFloat(gy) * TILE_PX - 8)
+        } else { placeGhost.isHidden = true }
     }
 }

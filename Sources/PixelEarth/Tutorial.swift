@@ -2,7 +2,8 @@ import Foundation
 
 /// The first afternoon: guided steps, then free time on the surface, then the disaster. Rule-level, no SpriteKit.
 enum Tutorial {
-    static let look = 0, walk = 1, jump = 2, chop = 3, planks = 4, bench = 5, sword = 6, slime = 7, feed = 8, done = 9
+    /// The first five minutes are about the jar, not crafting: look, move, follow a light, feed it, hide it.
+    static let look = 0, walk = 1, jump = 2, follow = 3, feed = 4, cover = 5, done = 6
     /// How long the surface stays peaceful after the last step.
     static let freeTime = 180.0
     /// Skipping keeps a short calm so the disaster does not land on the first frame.
@@ -14,11 +15,9 @@ enum Tutorial {
 }
 
 extension Game {
-    private var plankWorth: Int { countItem(Tile.wood) * 4 + countItem(Tile.plank) }
-
     func startTutorial() {
         tutorialStep = Tutorial.look; tutorialCalm = 0; tutorialWalked = 0; tutorialLastX = player.x; tutorialSlimeT = 0
-        jarLooked = false; tremorStage = 0; freeChest = nil
+        jarLooked = false; tremorStage = 0; freeChest = nil; tutorialSpore = nil; tutorialCovered = false
         newItemId = nil; newItemT = 0; craftOpened = false
     }
 
@@ -35,17 +34,14 @@ extension Game {
         if tutorialStep == Tutorial.look { tutorialLastX = player.x }
         tutorialWalked += abs(player.x - tutorialLastX); tutorialLastX = player.x
         switch tutorialStep {
+        case Tutorial.look: if jarLooked { advanceTutorial() }
         case Tutorial.walk: if tutorialWalked >= 6 { advanceTutorial() }
         case Tutorial.jump: if !player.ground && player.vy < 0 { advanceTutorial() }
-        case Tutorial.chop: if plankWorth >= 16 || nearBench() { advanceTutorial() }
-        case Tutorial.planks: if countItem(Tile.plank) >= 16 || nearBench() { advanceTutorial() }
-        case Tutorial.bench: if nearBench() { advanceTutorial() }
-        case Tutorial.sword: if countItem(Item.woodSword) > 0 { advanceTutorial() }
-        case Tutorial.slime:
-            if countItem(Item.gel) > 0 || jar.gel > 0 { advanceTutorial() } else { keepTutorialSlime(dt) }
-        case Tutorial.feed:
-            if jar.gel > 0 { advanceTutorial() } else if countItem(Item.gel) == 0 { keepTutorialSlime(dt) }
-        case Tutorial.look: if jarLooked { advanceTutorial() }
+        case Tutorial.follow:
+            if countItem(Tile.greenSpore) > 0 || jar.sporeG { advanceTutorial() } else { keepTutorialSpore() }
+        case Tutorial.feed: if jar.sporeG { advanceTutorial() }
+        case Tutorial.cover:
+            if jarCovered { tutorialCovered = true } else if tutorialCovered { advanceTutorial() }
         default: break
         }
         return false
@@ -60,14 +56,14 @@ extension Game {
         }
     }
 
-    /// A slime nearby for the combat step, replaced if it wanders off or dies without dropping gel.
-    private func keepTutorialSlime(_ dt: Double) {
-        tutorialSlimeT -= dt
-        guard tutorialSlimeT <= 0 else { return }
-        tutorialSlimeT = 2
-        if enemies.contains(where: { $0.type == .slime && abs($0.x - player.x) < 30 }) { return }
-        let sx = max(3, min(world.w - 4, Int(player.x) + (player.face >= 0 ? 9 : -9)))
-        enemies.append(Enemy(type: .slime, x: Double(sx) + 0.5, y: Double(world.surfaceAt(sx) - 2)))
+    /// A green spore glowing a short walk away: the first thing the jar's light leads to.
+    private func keepTutorialSpore() {
+        if let t = tutorialSpore, world.get(t.x, t.y) == Tile.greenSpore { return }
+        let dir = player.face >= 0 ? 1 : -1
+        for d in [12, -12, 16, -16, 9, -9] {
+            let x = max(4, min(world.w - 5, Int(player.x) + dir * d)), y = world.surfaceAt(x) - 1
+            if world.get(x, y) == Tile.air && world.solid(x, y + 1) { setTile(x, y, Tile.greenSpore); tutorialSpore = (x, y); return }
+        }
     }
 
     /// Leaves a reward over the hill: a reason to walk around before the ground opens.
@@ -77,7 +73,7 @@ extension Game {
         for _ in 0..<20 where world.get(x, world.surfaceAt(x) - 1) != Tile.air { x += dir }
         let y = world.surfaceAt(x) - 1
         guard world.get(x, y) == Tile.air else { return }
-        world.chests["\(x),\(y)"] = [ItemStack(id: Tile.torch, n: 10), ItemStack(id: Item.potion, n: 2), ItemStack(id: Tile.wood, n: 12)]
+        world.chests["\(x),\(y)"] = [ItemStack(id: Tile.greenPlant, n: 3), ItemStack(id: Item.potion, n: 2), ItemStack(id: Tile.wood, n: 12)]
         setTile(x, y, Tile.chest)
         freeChest = (x, y)
     }
@@ -109,8 +105,10 @@ extension Game {
             return (L("objective.free"), L("objective.free.detail"))
         }
         var detail = L("step.\(tutorialStep).detail")
-        if tutorialStep == Tutorial.chop { detail += " (\(min(4, plankWorth / 4))/4)" }
-        if tutorialStep == Tutorial.planks { detail += " (\(min(16, countItem(Tile.plank)))/16)" }
+        if tutorialStep == Tutorial.follow, let t = tutorialSpore {
+            let d = t.x - Int(player.x)
+            if abs(d) > 2 { detail += " · " + String(format: L(d > 0 ? "objective.follow.right" : "objective.follow.left"), abs(d)) }
+        }
         return (String(format: L("objective.step"), tutorialStep + 1, Tutorial.done, L("step.\(tutorialStep).title")), detail)
     }
 }

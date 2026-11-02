@@ -341,11 +341,11 @@ final class World {
     /// Act 3: the stratum becomes diggable; handled by TILES tier override in Game.
 
     private func loot(depth: Double) -> [ItemStack] {
-        var l = [ItemStack(id: Tile.torch, n: 3 + rng.int(6))]
+        var l = [ItemStack(id: [Tile.greenPlant, Tile.redPlant, Tile.bluePlant][rng.int(3)], n: 1 + rng.int(2))]
         if rng.next() < 0.7 { l.append(ItemStack(id: Item.arrow, n: 8 + rng.int(10))) }
         if rng.next() < 0.6 { l.append(ItemStack(id: Item.potion, n: 1 + rng.int(2))) }
-        if rng.next() < 0.5 { l.append(ItemStack(id: Item.ironBar, n: 2 + rng.int(4))) }
-        if depth > 0.45 && rng.next() < 0.45 { l.append(ItemStack(id: Item.goldBar, n: 1 + rng.int(3))) }
+        if rng.next() < 0.5 { l.append(ItemStack(id: Tile.iron, n: 2 + rng.int(4))) }
+        if depth > 0.45 && rng.next() < 0.45 { l.append(ItemStack(id: Tile.gold, n: 1 + rng.int(3))) }
         if depth > 0.6 && rng.next() < 0.3 { l.append(ItemStack(id: Item.diamond, n: 1)) }
         if rng.next() < 0.2 { l.append(ItemStack(id: Item.lightShard, n: 1)) }
         if rng.next() < 0.25 { l.append(ItemStack(id: Tile.lantern, n: 2)) }

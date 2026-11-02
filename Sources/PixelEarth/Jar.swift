@@ -25,6 +25,16 @@ struct Jar: Codable {
     var stage: Int { score >= 22 ? 2 : (score >= 11 ? 1 : 0) }
     var stageName: String { ["유리병", "등불", "등에 메는 온실"][stage] }
 
+    // The jar is the only tool: the hands dig, strike and endure with whatever light it holds.
+    /// How many of the three lights it carries (0...3).
+    var colors: Int { (isRed ? 1 : 0) + (isGreen ? 1 : 0) + (isBlue ? 1 : 0) }
+    /// Hardest tile the hands can break: stone and gold at first, diamond once the jar is a lantern.
+    var digTier: Int { 2 + min(1, stage) }
+    var digPower: Double { 1.8 * (1 + 0.5 * Double(colors) + 0.5 * Double(stage)) }
+    var strike: Int { Int(12 * (1 + 0.6 * Double(colors) + 0.5 * Double(stage))) }
+    /// Share of harm the light takes instead of the body.
+    var ward: Double { min(0.45, 0.08 * Double(colors) + 0.1 * Double(stage)) }
+
     var isRed: Bool { light.r >= 9 }
     var isGreen: Bool { light.g >= 9 }
     var isBlue: Bool { light.b >= 9 }

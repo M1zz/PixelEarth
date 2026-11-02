@@ -5,11 +5,11 @@ extension Game {
 
     static let fragments: [Int: String] = [
         4: "4층 · 무너진 옛 통로 — 누군가 여기서 살았다. 문은 안쪽에서 잠겨 있었다.",
-        5: "5층 · 균열의 숲 — 틈으로 하늘이 한 줄기 떨어진다. 여기라면 살 수 있다.",
+        5: "5층 · 균열의 숲 — 빛기둥의 금 사이로 빛이 새어 나온다. 여기라면 살 수 있다.",
         6: "6층 · 붉은 가장자리 — 벽이 따뜻하다. 돌 속에서 무언가 비친다. 붉은 빛이 있다면 보일 것이다.",
         7: "7층 · 물의 층 — 물이 벽처럼 서 있다. 옛 사람들은 이 물을 '장막'이라 불렀다.",
         8: "8층 · 불이 꺼지는 어둠 — 횃불이 죽는다. 살아 있는 빛만이 여기서 숨 쉰다.",
-        9: "9층 · 빛의 도시 — 하늘이 여기 있다. 그들이 끌어내린 것이다.",
+        9: "9층 · 빛의 도시 — 깨진 빛기둥이 도시 한가운데 서 있다. 하늘이 여기 있다.",
     ]
 
     func updateStory(_ dt: Double) {
@@ -25,7 +25,7 @@ extension Game {
                 for t in world.shaftTiles { onTileChanged?(t.x, t.y) }
                 for _ in 0..<60 { particles.append(Particle(x: Double(world.shaftX) + Double.random(in: -2...2), y: Double(world.surfaceAt(world.shaftX)) - Double.random(in: 0...4), vx: Double.random(in: -4...4), vy: Double.random(in: -9 ... -2), t: 1.2, life: 1.2, color: RGB(r: 120, g: 100, b: 90))) }
                 sfx(.roar); onStoryEvent?("disaster")
-                message("하늘의 빛이 땅속으로 빨려 들어간다 — 발밑이 갈라졌다. 내려가야 한다.")
+                message("빛안개가 거꾸로 땅속으로 빨려 들어간다 — 발밑이 갈라졌다. 내려가야 한다.")
             }
             if disasterStruck && py > Layers.bandTop + 3 {
                 act = 2

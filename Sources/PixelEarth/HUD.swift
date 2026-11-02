@@ -129,7 +129,7 @@ final class HUD {
     func layout() {
         heartsNode.position = CGPoint(x: -hw + 12, y: hh - 20)
         breathBg.position = CGPoint(x: -hw + 14 + 60, y: hh - 40); breathBar.position = CGPoint(x: -hw + 16, y: hh - 40)
-        hotbarNode.position = CGPoint(x: -4 * 44, y: -hh + 30)
+        hotbarNode.position = CGPoint(x: -CGFloat(Game.handSlots - 1) * 22, y: -hh + 30)
         jarIcon.position = CGPoint(x: -hw + 36, y: hh - 86); jarIconGlow.position = jarIcon.position
         jarLabel.position = CGPoint(x: -hw + 60, y: hh - 86)
         clock.position = CGPoint(x: hw - 14, y: hh - 22); dayLabel.position = CGPoint(x: hw - 14, y: hh - 36)
@@ -226,7 +226,7 @@ final class HUD {
 
     func rebuildHotbar(_ game: Game) {
         hotbarNode.removeAllChildren()
-        for i in 0..<9 {
+        for i in 0..<Game.handSlots {
             let sel = i == game.player.sel
             let s = SKSpriteNode(texture: sel ? assets.slotSel : assets.slot); s.size = CGSize(width: 40, height: 40); s.position = CGPoint(x: CGFloat(i) * 44, y: 0); s.name = "hot:\(i)"
             hotbarNode.addChild(s)
@@ -318,7 +318,7 @@ final class HUD {
         } else {
             let p = makePanel(width: 420, height: 360); n.addChild(p)
             let title = label("INVENTORY", size: 14, color: SKColor(red: 1, green: 0.7, blue: 0.24, alpha: 1), font: HUD.fontMono); title.position = CGPoint(x: -190, y: 160); n.addChild(title)
-            let note = label("칸을 누르면 선택한 핫바 칸과 자리를 바꿉니다. 물약·갑옷·결정은 눌러서 사용합니다.", size: 10, color: SKColor(white: 0.7, alpha: 1)); note.position = CGPoint(x: -190, y: 140); n.addChild(note)
+            let note = label("칸을 고르면 지금 든 손 칸(1~4)과 자리를 바꿉니다. 물약과 빛 조각은 골라서 씁니다.", size: 10, color: SKColor(white: 0.7, alpha: 1)); note.position = CGPoint(x: -190, y: 140); n.addChild(note)
             for i in 0..<40 {
                 let sel = i == game.player.sel
                 let s = SKSpriteNode(texture: sel ? assets.slotSel : assets.slot); s.size = CGSize(width: 40, height: 40)
@@ -328,7 +328,8 @@ final class HUD {
                     if itemStackable(st.id) { let c = label("\(st.n)", size: 9, font: HUD.fontMono, align: .right); c.position = CGPoint(x: 17, y: -13); c.name = s.name; s.addChild(c) }
                 }
             }
-            let armorText = "갑옷: " + (game.player.armorId.flatMap { ITEMS[$0]?.name } ?? "없음") + "  ·  최대 체력 \(game.player.maxhp)" + (game.player.armor > 0 ? "  ·  피해 -\(Int(game.player.armor * 100))%" : "")
+            let ward = max(game.player.armor, game.jar.ward)
+            let armorText = "\(game.jar.stageName) · \(game.jar.colorName)  ·  빛의 그릇 \(game.player.maxhp)  ·  캐는 힘 \(String(format: "%.1f", game.jar.digPower))  ·  치는 힘 \(game.jar.strike)" + (ward > 0 ? "  ·  빛이 막는 피해 -\(Int(ward * 100))%" : "")
             let al = label(armorText, size: 11, color: SKColor(white: 0.8, alpha: 1)); al.position = CGPoint(x: -190, y: -122); n.addChild(al)
             let close = makeButton("닫기 [ESC]", name: "close", width: 120, height: 26, fontSize: 11); close.position = CGPoint(x: 0, y: -155); n.addChild(close)
         }
@@ -416,9 +417,9 @@ final class HUD {
         let dim = SKSpriteNode(color: SKColor(white: 0, alpha: 0.7), size: CGSize(width: 4000, height: 4000)); dim.name = "dim"; n.addChild(dim)
         let p = makePanel(width: 560, height: 300); n.addChild(p)
         let t = label("빛의 심장이 깨어났다", size: 18, color: SKColor(red: 1, green: 0.95, blue: 0.8, alpha: 1), align: .center); t.position = CGPoint(x: 0, y: 110); n.addChild(t)
-        let lines = ["그들은 하늘의 빛을 여기로 끌어내렸다. 그래서 위는 어두워졌고, 아래는 밝아졌다.",
-                     "빛을 위로 돌려보내면 무너진 암석이 부서지고, 올라가는 길이 열린다. 캠프 사람들이 따라올 것이다.",
-                     "빛을 여기 남기면 지하 도시가 새 집이 된다. 하늘은 어두운 채로."]
+        let lines = ["그들은 빛기둥을 깨고 하늘로 오르던 빛을 여기 붙잡았다. 그래서 위는 어두워졌고, 아래는 밝아졌다.",
+                     "빛을 위로 돌려보내면 기둥이 이어져 무너진 암석이 부서지고, 올라가는 길이 열린다. 캠프 사람들이 따라올 것이다.",
+                     "빛을 여기 남기면 지하 도시가 새 집이 된다. 하늘은 꺼진 채로."]
         for (i, s) in lines.enumerated() { let l = label(s, size: 11.5, color: SKColor(white: 0.8, alpha: 1), align: .center); l.position = CGPoint(x: 0, y: 70 - CGFloat(i) * 22); n.addChild(l) }
         let up = makeButton("빛을 위로 돌려보낸다 — 하늘을 되찾는다", name: "choice:up", width: 420, height: 36, fontSize: 13, accent: true); up.position = CGPoint(x: 0, y: -30); n.addChild(up)
         let stay = makeButton("빛을 여기 남긴다 — 지하에 산다", name: "choice:stay", width: 420, height: 36, fontSize: 13); stay.position = CGPoint(x: 0, y: -80); n.addChild(stay)
@@ -434,7 +435,7 @@ final class HUD {
         let p = makePanel(width: 520, height: 420); n.addChild(p)
         let t = label("PIXEL EARTH", size: 30, color: SKColor(red: 1, green: 0.7, blue: 0.24, alpha: 1), font: HUD.fontMono, align: .center); t.position = CGPoint(x: 0, y: 160); n.addChild(t)
         let shadow = label("PIXEL EARTH", size: 30, color: .black, font: HUD.fontMono, align: .center); shadow.position = CGPoint(x: 3, y: 157); shadow.zPosition = -1; n.addChild(shadow)
-        let s1 = label("마지막 남은 빛을 병에 담아 들고, 땅속으로 내려가,", size: 12, color: SKColor(white: 0.75, alpha: 1), align: .center); s1.position = CGPoint(x: 0, y: 122); n.addChild(s1)
+        let s1 = label("별을 잃은 행성 나엘. 하늘의 마지막 빛을 병에 담아 들고 땅속으로 내려가,", size: 12, color: SKColor(white: 0.75, alpha: 1), align: .center); s1.position = CGPoint(x: 0, y: 122); n.addChild(s1)
         let s2 = label("그 빛을 키워 하늘을 되찾는 이야기.", size: 12, color: SKColor(white: 0.75, alpha: 1), align: .center); s2.position = CGPoint(x: 0, y: 104); n.addChild(s2)
         var y: CGFloat = 60
         if hasSave { let b = makeButton("이어하기", name: "menu:continue", width: 300, height: 36, fontSize: 14, accent: true); b.position = CGPoint(x: 0, y: y); n.addChild(b); y -= 46 }

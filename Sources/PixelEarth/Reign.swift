@@ -46,8 +46,8 @@ enum Reign {
         case 5: return [Tile.greenSpore, Item.gel, Tile.iron]
         case 6: return [Tile.redSpore, Tile.iron, Tile.gold]
         case 7: return [Tile.blueSpore, Tile.gold, Item.potion]
-        case 8: return [Tile.gold, Item.goldBar, Item.diamond]
-        default: return [Item.goldBar, Item.diamond, Item.lightShard]
+        case 8: return [Tile.gold, Tile.iron, Item.diamond]
+        default: return [Tile.gold, Item.diamond, Item.lightShard]
         }
     }
     /// Throne position, on the floor row of the lair. Fixed, so old saves can gain lairs on load.

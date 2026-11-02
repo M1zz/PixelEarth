@@ -120,6 +120,23 @@
         }
       }
     },
+    "cover.first" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You cover the jar. What follows light loses you. You can barely see."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "병을 가렸다. 빛을 쫓는 것들이 당신을 놓친다. 당신도 거의 보지 못한다."
+          }
+        }
+      }
+    },
     "defense.fell" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -681,6 +698,23 @@
         }
       }
     },
+    "hint.cover" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cover the jar"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "병 가리기"
+          }
+        }
+      }
+    },
     "hint.craft" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -783,6 +817,40 @@
         }
       }
     },
+    "hint.follow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Follow the light"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "빛을 따라가기"
+          }
+        }
+      }
+    },
+    "hint.holdItem" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hold %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 손에 들기"
+          }
+        }
+      }
+    },
     "hint.holding" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -806,30 +874,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Empty hand"
+            "value" : "Empty hands · you dig and fight with the jar’s light"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "손에 든 것 없음"
-          }
-        }
-      }
-    },
-    "hint.holdItem" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hold %@"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 손에 들기"
+            "value" : "빈손 · 병의 빛으로 캐고 싸운다"
           }
         }
       }
@@ -1089,6 +1140,23 @@
         }
       }
     },
+    "hint.uncover" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uncover the jar"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "병 열기"
+          }
+        }
+      }
+    },
     "hint.use" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1146,13 +1214,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A quiet afternoon. Grandmother hands you a small jar with a light breathing inside. “Don’t let it go out.”"
+            "value" : "The brightest afternoon of the skymist. Grandmother, the village’s last mist-keeper, hands you a small jar with a handful of sky breathing inside. “Don’t let it go out.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "조용한 오후. 할머니가 작은 병을 건넸다. 안에서 빛이 숨 쉬고 있다. “꺼뜨리지 마라.”"
+            "value" : "빛안개가 가장 밝은 오후. 마을의 마지막 안개지기인 할머니가 작은 병을 건넸다. 안에서 하늘 한 줌이 숨 쉬고 있다. “꺼뜨리지 마라.”"
           }
         }
       }
@@ -1775,13 +1843,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“Our children learned the sky from a painting, blue stone dust on the ceiling. When one asked if the real sky was this low too, I decided to pull it down.”"
+            "value" : "“Our children learned the sky from a painting, teal stone dust on the ceiling. When one asked if the real sky was this low too, I decided to break the pillar’s shell.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“우리 아이들은 하늘을 그림으로 배웠다. 푸른 돌가루로 천장에 칠한 하늘. 한 아이가 진짜 하늘도 이렇게 낮으냐고 물었을 때, 나는 하늘을 끌어내리기로 했다.”"
+            "value" : "“우리 아이들은 하늘을 그림으로 배웠다. 청록 돌가루로 천장에 칠한 빛안개. 한 아이가 진짜 하늘도 이렇게 낮으냐고 물었을 때, 나는 기둥의 껍질을 깨기로 했다.”"
           }
         }
       }
@@ -1843,13 +1911,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "They say the world went dark because the lord of floor 9 stole the sky."
+            "value" : "They say the sky went out because the lord of floor 9 broke the light pillar and stole the sky."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "세상이 어두워진 건 9층 주인이 하늘을 훔쳤기 때문이라 한다."
+            "value" : "하늘이 꺼진 건 9층 주인이 빛기둥을 깨고 하늘을 훔쳤기 때문이라 한다."
           }
         }
       }
@@ -1860,13 +1928,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The City of Light was built by the people the world above threw away. Work, debt and sickness could all just be sent down. He watched children born below grow up without ever seeing the sky, so he pulled it down. The light Grandmother put in the jar was the last handful he could not take."
+            "value" : "The City of Light was built beside the light pillar by the people the world above threw away. Work, debt and sickness could all just be sent down. The heart’s light flowed past behind a shell of stone to become the sky up there; the children below never once touched it. He broke the shell and held the light. What Grandmother put in the jar was the last handful left in the sky."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "빛의 도시는 위에서 버린 사람들이 세운 도시였다. 일도, 빚도, 병도 아래로 내려보내면 그만이었다. 그는 아래서 태어난 아이들이 한 번도 하늘을 보지 못한 채 자라는 것을 보고 하늘을 끌어내렸다. 할머니가 병에 담은 빛은 그가 미처 다 가져오지 못한 마지막 한 줌이었다."
+            "value" : "빛의 도시는 위에서 버린 사람들이 빛기둥 곁에 세운 도시였다. 일도, 빚도, 병도 아래로 내려보내면 그만이었다. 심장의 빛은 돌 껍질 너머로 흘러 위의 하늘이 될 뿐, 아래 아이들은 그 빛을 한 번도 만지지 못했다. 그는 껍질을 깨고 빛을 붙잡았다. 할머니가 병에 담은 빛은 하늘에 남은 마지막 한 줌이었다."
           }
         }
       }
@@ -1928,13 +1996,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“There is a village whose spring ran dry. Without this tribute they will not see out the winter.”"
+            "value" : "“There is a village whose spring ran dry. Without this tribute they will not see out the long night.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“샘이 마른 마을이 있다. 이 공물이 아니면 그들은 이번 겨울을 넘기지 못한다.”"
+            "value" : "“샘이 마른 마을이 있다. 이 공물이 아니면 그들은 이번 긴 밤을 넘기지 못한다.”"
           }
         }
       }
@@ -2432,6 +2500,40 @@
         }
       }
     },
+    "objective.follow.left" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d tiles to the left"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "왼쪽으로 %d칸"
+          }
+        }
+      }
+    },
+    "objective.follow.right" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d tiles to the right"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오른쪽으로 %d칸"
+          }
+        }
+      }
+    },
     "objective.free" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2455,13 +2557,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cut trees, build a shelter, peek into a cave."
+            "value" : "Carry the jar over the hills. Some things answer its light."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "나무를 베고, 집을 짓고, 동굴도 들여다보자."
+            "value" : "병을 들고 언덕 너머를 둘러보자. 빛에 반응하는 것들이 있다."
           }
         }
       }
@@ -2744,13 +2846,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The ceiling is painted with a sky of blue stone dust. One cloud is still wet, and under it is a small handprint."
+            "value" : "The ceiling is painted with skymist in teal stone dust. One fold of the curtain is still wet, and under it is a small handprint."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "천장 가득 푸른 돌가루로 하늘이 칠해져 있다. 구름 하나는 덜 마른 채이고, 그 아래 작은 손자국이 찍혀 있다."
+            "value" : "천장 가득 청록 돌가루로 빛안개가 칠해져 있다. 커튼 한 자락은 덜 마른 채이고, 그 아래 작은 손자국이 찍혀 있다."
           }
         }
       }
@@ -2840,23 +2942,6 @@
         }
       }
     },
-    "reign.claimed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You are now lord %1$d of %2$@. Tribute will gather; when challenged, you must defend the throne."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "당신은 이제 %2$@의 제%1$d대 주인이다. 공물이 쌓이고, 도전이 오면 왕좌를 지켜야 한다."
-          }
-        }
-      }
-    },
     "reign.claimNames" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2870,6 +2955,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "왕좌 등받이에 이전 주인들의 이름이 새겨져 있다. 이제 그 끝에 당신의 이름이 있다."
+          }
+        }
+      }
+    },
+    "reign.claimed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You are now lord %1$d of %2$@. Tribute will gather; when challenged, you must defend the throne."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "당신은 이제 %2$@의 제%1$d대 주인이다. 공물이 쌓이고, 도전이 오면 왕좌를 지켜야 한다."
           }
         }
       }
@@ -2993,23 +3095,6 @@
         }
       }
     },
-    "reign.note" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Defeat a lord, carry the floor's light, and press K at the throne to rule."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "주인을 쓰러뜨리고 그 층의 빛을 지닌 채 왕좌에서 K를 누르면 주인이 됩니다."
-          }
-        }
-      }
-    },
     "reign.noTribute" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3023,6 +3108,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "아직 쌓인 공물이 없다."
+          }
+        }
+      }
+    },
+    "reign.note" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Defeat a lord, carry the floor's light, and press K at the throne to rule."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "주인을 쓰러뜨리고 그 층의 빛을 지닌 채 왕좌에서 K를 누르면 주인이 됩니다."
           }
         }
       }
@@ -3356,13 +3458,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "With the pickaxe, stand at a trunk and hold K"
+            "value" : "A green light flickers nearby. Walk to it and hold K to dig it up"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "곡괭이를 들고 나무 기둥 앞에서 K를 길게 누르자"
+            "value" : "어딘가에서 초록 빛이 깜빡인다. 가서 K를 길게 눌러 캐자"
           }
         }
       }
@@ -3373,13 +3475,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cut a tree"
+            "value" : "Follow the light"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "나무 베기"
+            "value" : "빛을 따라가기"
           }
         }
       }
@@ -3390,154 +3492,18 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Press E, choose with W A S D, craft with K"
+            "value" : "Hold the green spore with a number key and press F. What goes in changes the light"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "E로 제작 창을 열고 W A S D로 고른 뒤 K로 만들자"
+            "value" : "초록 포자를 숫자 키로 들고 F를 누르자. 병에 넣은 것이 빛의 색을 바꾼다"
           }
         }
       }
     },
     "step.4.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Make planks"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "판자 만들기"
-          }
-        }
-      }
-    },
-    "step.5.detail" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Craft a workbench with E, hold it, and press L"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E에서 작업대를 만든 뒤, 들고 L을 누르자"
-          }
-        }
-      }
-    },
-    "step.5.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Place a workbench"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "작업대 놓기"
-          }
-        }
-      }
-    },
-    "step.6.detail" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Next to the workbench, press E and craft a wooden sword under Weapons with K"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "작업대 곁에서 E를 열고 무기 탭의 나무 검을 K로 만들자"
-          }
-        }
-      }
-    },
-    "step.6.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Make a wooden sword"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "나무 검 만들기"
-          }
-        }
-      }
-    },
-    "step.7.detail" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select the sword with a number key and press K near the slime"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "검을 숫자 키로 들고 슬라임 곁에서 K를 누르자"
-          }
-        }
-      }
-    },
-    "step.7.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Defeat a slime"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "슬라임 잡기"
-          }
-        }
-      }
-    },
-    "step.8.detail" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hold the gel with a number key and press F. What goes in changes the light"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "젤을 숫자 키로 들고 F를 누르자. 병에 넣은 것이 빛의 색을 바꾼다"
-          }
-        }
-      }
-    },
-    "step.8.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -3550,6 +3516,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "병에 넣기"
+          }
+        }
+      }
+    },
+    "step.5.detail" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Press C to cover the jar, then C again to uncover it. Things in the dark come for the light"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C로 병을 가렸다가 다시 C로 열자. 어둠 속의 것들은 빛을 보고 온다"
+          }
+        }
+      }
+    },
+    "step.5.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide the light"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "빛을 가리기"
           }
         }
       }
@@ -3611,13 +3611,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The sky looks wrong. The light in the jar leans downward."
+            "value" : "The skymist flickers. The light in the jar leans downward."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "하늘빛이 어딘가 이상하다. 병 속 빛이 아래로 기운다."
+            "value" : "빛안개가 깜빡인다. 병 속 빛이 아래로 기운다."
           }
         }
       }

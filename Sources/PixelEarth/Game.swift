@@ -15,6 +15,8 @@ enum SFX: String { case dig, brk, place, jump, hurt, pick, craft, swing, bow, hi
 
 /// All simulation state and rules. Rendering lives in GameScene; this type never touches SpriteKit.
 final class Game {
+    /// What the hands can reach without opening the bag: few on purpose, the jar is the real tool.
+    static let handSlots = 4
     /// Half the screen width in tiles, kept by the scene so enemies spawn out of sight at any zoom.
     var viewHalfTiles = 23
     let world = World()
@@ -43,6 +45,15 @@ final class Game {
     var jar = Jar()
     var jarDim = 1.0            // drops when something dangerous is near
     var jarNearOre = false      // bugs cluster toward ore
+    /// C: the jar under a cloth. What hunts by light loses you; you see almost nothing.
+    var jarCovered = false, shownCover = false
+    /// The jar's light this frame: hurt dims it, the cloth nearly hides it, danger makes it flinch.
+    var jarStrength: Double {
+        if jarCovered { return 0.15 }
+        return jarDim * (0.4 + 0.6 * Double(max(0, player.hp)) / Double(max(1, player.maxhp)))
+    }
+    /// Light-led creatures follow the player only while they can see the jar, or when close enough to smell them.
+    func seesPlayer(_ e: Enemy, dist: Double) -> Bool { !jarCovered || dist < 3.5 || e.lordFloor != nil || e.attackerCost > 0 }
     var act = 1                 // 1 descent, 2 settle, 3 reclaim, 4 stayed below, 5 sky regained
     var storyT = 0.0
     var disasterStruck = false
@@ -54,6 +65,7 @@ final class Game {
     var shownTorchEaten = false
     var passagesSeen: Set<Int> = []
     var tutorialStep = Tutorial.done, tutorialCalm = 0.0, tutorialWalked = 0.0, tutorialLastX = 0.0, tutorialSlimeT = 0.0
+    var tutorialSpore: (x: Int, y: Int)? = nil, tutorialCovered = false
     var jarLooked = false, tremorStage = 0
     var freeChest: (x: Int, y: Int)? = nil
     // --- floor thrones (see Reign.swift)
@@ -63,6 +75,7 @@ final class Game {
     var floorLord: Enemy? = nil
     var defense: Defense? = nil
     var aimX = 0.0, aimY = 0.0  // tile centre K and L act on this frame
+    var placeRepeatT = 0.0, placeHolding = false   // one block per press; holding repeats like a key
     // --- nudges (see KeyHints.swift); saved games already know the basics
     var newItemId: Int? = nil, newItemT = 0.0, craftOpened = true
     var onStoryEvent: ((String) -> Void)?   // "disaster", "collapse", "camp", "choice", "sky"
@@ -79,7 +92,7 @@ final class Game {
     var sunLight: Double { max(0, min(1, (sin((worldTime - 0.25) * .pi * 2) + 0.45) / 1.1)) }
     /// Daylight after the disaster dimmed the sky.
     var dayLight: Double { sunLight * skyFactor }
-    var skyLight: RGB { let d = dayLight; return RGB(r: Int((3 + 12 * d).rounded()), g: Int((3 + 12 * d).rounded()), b: Int((5 + 10 * d).rounded())) }
+    var skyLight: RGB { let d = dayLight; return RGB(r: Int((3 + 9 * d).rounded()), g: Int((3 + 12 * d).rounded()), b: Int((5 + 10 * d).rounded())) }
 
     init() { world.light = light }
 
@@ -96,10 +109,10 @@ final class Game {
         placePlayer()
         player.hp = 100; player.maxhp = 100; player.armor = 0; player.armorId = nil
         player.inv = Array(repeating: nil, count: 40); player.sel = 0
-        _ = addItem(Item.woodPick, 1); _ = addItem(Tile.torch, 6); _ = addItem(Item.potion, 1)
+        _ = addItem(Item.potion, 1)
         worldTime = 0.33; day = 1
         enemies = []; drops = []; arrows = []; floats = []; particles = []; boss = nil
-        jar = Jar(); act = 1; storyT = 0; disasterStruck = false; skyFactor = 1; skyTarget = 1
+        jar = Jar(); jarCovered = false; act = 1; storyT = 0; disasterStruck = false; skyFactor = 1; skyTarget = 1
         layersSeen = []; passagesSeen = []; ascent = 0; pendingChoice = false; world.pedestalState = [:]
         startTutorial()
         loaded = true
@@ -196,14 +209,14 @@ final class Game {
 
     struct HeldStats { var tier: Int; var power: Double; var dmg: Int; var tool: ToolKind? }
     func heldStats() -> HeldStats {
-        guard let h = player.held, let it = ITEMS[h.id] else { return HeldStats(tier: 0, power: 1, dmg: 3, tool: nil) }
-        return HeldStats(tier: it.tool == .pick ? it.tier : 0, power: it.power, dmg: max(3, it.dmg), tool: it.tool)
+        if let h = player.held, let it = ITEMS[h.id], it.tool == .bow { return HeldStats(tier: 0, power: 1, dmg: it.dmg + jar.strike / 3, tool: .bow) }
+        return HeldStats(tier: jar.digTier, power: jar.digPower, dmg: jar.strike, tool: .pick)
     }
 
     func damagePlayer(_ nIn: Int, from src: Entity? = nil) {
         if player.iframe > 0 || player.dead > 0 { return }
         let lordFactor = rulesCurrentFloor ? Reign.damageTaken : 1
-        let n = max(1, Int((Double(nIn) * (1 - player.armor) * lordFactor).rounded()))
+        let n = max(1, Int((Double(nIn) * (1 - max(player.armor, jar.ward)) * lordFactor).rounded()))
         player.iframe = 0.7; player.hp -= n; sfx(.hurt)
         floats.append(FloatText(x: player.x, y: player.y, t: 1, text: "-\(n)", color: RGB(r: 255, g: 107, b: 107)))
         if let s = src { player.vx = (player.x - s.x >= 0 ? 1 : -1) * 7; player.vy = -6 }
@@ -266,7 +279,7 @@ final class Game {
 
     func openChest(_ tx: Int, _ ty: Int) {
         let key = "\(tx),\(ty)"
-        let loot = world.chests[key] ?? [ItemStack(id: Tile.torch, n: 3)]
+        let loot = world.chests[key] ?? [ItemStack(id: Tile.greenSpore, n: 2)]
         world.chests[key] = nil
         setTile(tx, ty, Tile.air); sfx(.open)
         for s in loot { dropItem(s.id, s.n, Double(tx) + 0.5, Double(ty) + 0.3) }
@@ -274,11 +287,17 @@ final class Game {
         message("보물상자를 열었습니다!")
     }
 
-    /// A torch the light-starved would rather reach than the player.
+    /// Any placed light the light-starved would rather reach than the player: fire or living light.
+    static func isLure(_ t: Int) -> Bool { t == Tile.torch || t == Tile.lantern || t == Tile.redPlant || t == Tile.greenPlant || t == Tile.bluePlant }
+    func toggleCover() {
+        guard player.dead <= 0 else { return }
+        jarCovered.toggle(); sfx(.pick)
+        if jarCovered && !shownCover { shownCover = true; tip(L("cover.first")) }
+    }
     func nearestTorch(to e: Enemy, within limit: Double) -> (x: Int, y: Int)? {
         let ex = Int(floor(e.x)), ey = Int(floor(e.y + e.h / 2))
         var best: (x: Int, y: Int)? = nil, bd = min(limit, 12.0)
-        for y in (ey - 5)...(ey + 5) { for x in (ex - 12)...(ex + 12) where world.get(x, y) == Tile.torch {
+        for y in (ey - 5)...(ey + 5) { for x in (ex - 12)...(ex + 12) where Game.isLure(world.get(x, y)) {
             let d = hypot(Double(x) + 0.5 - e.x, Double(y) + 0.5 - (e.y + e.h / 2))
             if d < bd { bd = d; best = (x, y) }
         } }
@@ -296,7 +315,7 @@ final class Game {
         player.face = wx > player.x ? 1 : -1; player.swing = 0.22
         let same = mineTarget.map { $0.x == tx && $0.y == ty } ?? false
         if tileTier(t) > st.tier {
-            if !same { tip(t == Tile.rubble ? "무너진 암석 — 아직은 뚫을 수 없다" : (tileTier(t) >= 9 ? "부술 수 없습니다" : "더 좋은 곡괭이가 필요합니다")) }
+            if !same { tip(t == Tile.rubble ? "무너진 암석 — 아직은 뚫을 수 없다" : (tileTier(t) >= 9 ? "부술 수 없습니다" : "빛이 더 자라야 한다 — 병을 등불만큼 키우자")) }
             mineTarget = (tx, ty); mineProg = 0; return
         }
         if !same { mineTarget = (tx, ty); mineProg = 0 }
@@ -409,7 +428,7 @@ final class Game {
         frame += 1
         worldTime += dt / dayLength
         newItemT = max(0, newItemT - dt)
-        if worldTime >= 1 { worldTime -= 1; day += 1; message("\(day)일째 아침") }
+        if worldTime >= 1 { worldTime -= 1; day += 1; message("심장이 크게 뛴다. 빛안개가 밝아진다 · \(day)일째") }
         let p = player
         if p.dead > 0 {
             p.dead -= dt
@@ -430,8 +449,12 @@ final class Game {
         if input.left { p.vx = max(-spd, p.vx - acc * dt); p.face = -1 }
         else if input.right { p.vx = min(spd, p.vx + acc * dt); p.face = 1 }
         else { p.vx *= p.ground ? 0.6 : 0.95 }
-        if input.jump && (p.ground || p.inWater) && !p.jumpLock {
-            p.vy = p.inWater ? -6 : -14.8; if !p.inWater { sfx(.jump) }; p.jumpLock = true
+        // Water: hold Space or W to swim up. Once the head is out and the feet are still wet, the same hold leaps onto the bank.
+        let feetWet = world.get(Int(floor(p.x)), Int(floor(p.y + p.h - 0.1))) == Tile.water
+        if p.inWater {
+            if input.jump || input.up { p.vy = min(p.vy, -6) }
+        } else if input.jump && (p.ground || feetWet) && !p.jumpLock {
+            p.vy = -14.8; sfx(.jump); p.jumpLock = true
         }
         if !input.jump { p.jumpLock = false }
         // vines: hold to climb, no gravity while on one
@@ -476,10 +499,16 @@ final class Game {
             if input.clicked { handled = useAt(wx, wy) }
             if (input.mouseDown || input.actHeld) && !handled { tryMine(dt, wx, wy) }
             else if input.rightDown || input.placeHeld {
-                let target = input.keyboardAim ? placeAim() : (x: wx, y: wy)
-                tryPlace(target.x, target.y); mineTarget = nil
+                // A tap lasts several frames; without this, the aim slides to the next free tile and places twice.
+                if placeRepeatT <= 0 {
+                    let target = input.keyboardAim ? placeAim() : (x: wx, y: wy)
+                    tryPlace(target.x, target.y)
+                    placeRepeatT = placeHolding ? 0.15 : 0.4
+                }
+                placeHolding = true; placeRepeatT -= dt; mineTarget = nil
             }
             else { mineTarget = nil }
+            if !(input.rightDown || input.placeHeld) { placeHolding = false; placeRepeatT = 0 }
         } else { mineTarget = nil }
         input.clicked = false
 
@@ -533,20 +562,23 @@ final class Game {
             let e = enemies[i]
             e.t += dt; e.anim += dt; if e.hurt > 0 { e.hurt -= dt }
             let dx = p.x - e.x, dy = (p.y + p.h / 2) - (e.y + e.h / 2), dist = hypot(dx, dy)
-            let sgn: Double = dx >= 0 ? 1 : -1
+            let sees = seesPlayer(e, dist: dist)
+            // Lost in the dark: drift the way it was going, turning now and then.
+            if !sees && Double.random(in: 0..<1) < dt * 0.5 { e.face = -e.face }
+            let sgn: Double = sees ? (dx >= 0 ? 1 : -1) : (e.face >= 0 ? 1 : -1)
             if dist > 55 && !e.boss && e.attackerCost == 0 { enemies.remove(at: i); continue }
             if e.attackerCost > 0 { marchAttacker(e, dt) } else { switch e.type {
             case .zombie:
                 // The light-starved go for the nearest flame before the player, and swallow it.
                 e.lureT -= dt
                 if e.lureT <= 0 { e.lureT = 0.6; e.lure = nearestTorch(to: e, within: dist) }
-                let tx = e.lure.map { Double($0.x) + 0.5 } ?? p.x
+                let tx = e.lure.map { Double($0.x) + 0.5 } ?? (sees ? p.x : e.x + sgn * 4)
                 let s: Double = tx >= e.x ? 1 : -1
                 if let l = e.lure, abs(tx - e.x) < 0.9 {
                     e.vx = 0; e.eatT += dt
                     if e.eatT > 1.5 {
                         e.eatT = 0; e.lure = nil
-                        if world.get(l.x, l.y) == Tile.torch { setTile(l.x, l.y, Tile.air); sfx(.hit); if !shownTorchEaten { shownTorchEaten = true; tip(L("starved.ateTorch")) } }
+                        if Game.isLure(world.get(l.x, l.y)) { setTile(l.x, l.y, Tile.air); sfx(.hit); if !shownTorchEaten { shownTorchEaten = true; tip(L("starved.ateTorch")) } }
                     }
                 } else { e.eatT = 0; e.vx = s * 3.4 }
                 e.face = s
@@ -557,7 +589,7 @@ final class Game {
             case .bat:
                 let sp = 4.5
                 e.vx += (sgn * sp - e.vx) * dt * 2
-                e.vy += (((dy >= 0 ? 1 : -1) * sp + sin(e.t * 6) * 3) - e.vy) * dt * 2
+                e.vy += (((sees ? (dy >= 0 ? 1 : -1) * sp : 0) + sin(e.t * 6) * 3) - e.vy) * dt * 2
                 e.face = sgn
             case .king:
                 if e.lordFloor != nil { lordTactics(e, dt) }
@@ -581,6 +613,7 @@ final class Game {
             moveEntity(e, world, dt)
             if e.inLava { damageEnemy(e, 20) }
             if e.y > Double(world.h) { enemies.remove(at: i); if e.boss { boss = nil }; continue }
+            if !sees { e.x = max(1, min(Double(world.w - 2), e.x)) }
             if abs(e.x - p.x) < (e.w + p.w) / 2 && e.y < p.y + p.h && e.y + e.h > p.y { damagePlayer(e.dmg, from: e) }
             if e.hp <= 0 {
                 enemies.remove(at: i)
@@ -635,11 +668,11 @@ final class Game {
     // MARK: lighting
 
     func recomputeLight(x0: Int, y0: Int, x1: Int, y1: Int) {
-        let jl = jar.light
+        let jl = jar.light, k = jarStrength
         let px = Int(floor(player.x)), py = Int(floor(player.y + 1))
-        var extra = [LightSource(x: px, y: py, r: Int(Double(jl.r) * jarDim), g: Int(Double(jl.g) * jarDim), b: Int(Double(jl.b) * jarDim))]
+        var extra = [LightSource(x: px, y: py, r: Int(Double(jl.r) * k), g: Int(Double(jl.g) * k), b: Int(Double(jl.b) * k))]
         // the jar glows wide: seed the four neighbours too so the core stays bright when it is held
-        for (dx, dy) in [(-1, 0), (1, 0), (0, -1)] { extra.append(LightSource(x: px + dx, y: py + dy, r: max(0, Int(Double(jl.r) * jarDim) - 1), g: max(0, Int(Double(jl.g) * jarDim) - 1), b: max(0, Int(Double(jl.b) * jarDim) - 1))) }
+        for (dx, dy) in [(-1, 0), (1, 0), (0, -1)] { extra.append(LightSource(x: px + dx, y: py + dy, r: max(0, Int(Double(jl.r) * k) - 1), g: max(0, Int(Double(jl.g) * k) - 1), b: max(0, Int(Double(jl.b) * k) - 1))) }
         if let b = boss { extra.append(LightSource(x: Int(floor(b.x)), y: Int(floor(b.y + 1)), r: 4, g: 9, b: 12)) }
         light.compute(world: world, x0: x0, y0: y0, x1: x1, y1: y1, sky: skyLight, extra: extra)
     }

@@ -69,7 +69,7 @@ enum SaveStore {
         w.seed = d.seed; w.noise = Noise(seed: d.seed)
         w.tiles = [UInt8](d.tiles); w.explored = [UInt8](d.explored); w.surface = d.surface; w.biome = [UInt8](d.biome); w.chests = d.chests
         let p = g.player
-        p.x = d.px; p.y = d.py; p.hp = d.hp; p.maxhp = d.maxhp; p.inv = d.inv; p.sel = d.sel; p.armor = d.armor; p.armorId = d.armorId
+        p.x = d.px; p.y = d.py; p.hp = d.hp; p.maxhp = d.maxhp; p.inv = d.inv; p.sel = min(d.sel, Game.handSlots - 1); p.armor = d.armor; p.armorId = d.armorId
         while p.inv.count < 40 { p.inv.append(nil) }
         p.vx = 0; p.vy = 0; p.dead = 0; p.breath = 10
         g.spawnX = d.spawnX; g.spawnY = d.spawnY; g.worldTime = d.worldTime; g.day = d.day
@@ -83,7 +83,7 @@ enum SaveStore {
         g.skyFactor = d.skyFactor ?? 0.22; g.skyTarget = g.act >= 5 ? 1 : (g.act == 3 ? 0.22 + 0.78 * (d.ascent ?? 0) : (g.disasterStruck ? 0.22 : 1))
         g.layersSeen = Set(d.layersSeen ?? []); g.ascent = d.ascent ?? 0; w.pedestalState = d.pedestalState ?? [:]; g.pendingChoice = false
         g.tutorialStep = d.tutorialStep ?? Tutorial.done; g.tutorialCalm = d.tutorialCalm ?? 0; g.tremorStage = d.tremorStage ?? 2
-        g.tutorialWalked = 0; g.tutorialLastX = p.x; g.tutorialSlimeT = 0; g.jarLooked = false
+        g.tutorialWalked = 0; g.tutorialLastX = p.x; g.tutorialSlimeT = 0; g.jarLooked = false; g.jarCovered = false
         if let x = d.freeChestX, let y = d.freeChestY { g.freeChest = (x, y) } else { g.freeChest = nil }
         g.loaded = true
         lastLoaded = d
