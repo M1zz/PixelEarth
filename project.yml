@@ -21,10 +21,10 @@ targets:
     info:
       path: Sources/PixelEarth-Info.plist
       properties:
-        CFBundleName: Pixel Earth
+        CFBundleName: 나엘
         CFBundleDevelopmentRegion: ko
         CFBundleLocalizations: [ko, en]
-        CFBundleDisplayName: Pixel Earth
+        CFBundleDisplayName: 나엘
         CFBundleShortVersionString: "0.1"
         CFBundleVersion: "1"
         LSApplicationCategoryType: public.app-category.games

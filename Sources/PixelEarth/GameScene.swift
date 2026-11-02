@@ -20,8 +20,12 @@ final class GameScene: SKScene {
     var starsNode = SKSpriteNode()
     var moonNode = SKSpriteNode()
     var mountainsA: [SKSpriteNode] = [], mountainsB: [SKSpriteNode] = []
-    var cloudNodes: [SKSpriteNode] = []
-    var cloudOffsets: [CGFloat] = []
+    /// Skymist: the sky is drawn by a shader (gradient + moving aurora curtains), quantized to chunky pixels.
+    let skyUniforms = (day: SKUniform(name: "u_day", float: 1), dusk: SKUniform(name: "u_dusk", float: 0),
+                       under: SKUniform(name: "u_under", float: 0), cam: SKUniform(name: "u_cam", float: 0),
+                       res: SKUniform(name: "u_res", vectorFloat2: vector_float2(800, 600)))
+    /// Light rises from below on Nael: slow motes drift upward around the player, tinted by the floor's light.
+    let motes = SKEmitterNode()
 
     // lighting
     let lightSprite = SKSpriteNode(color: .white, size: CGSize(width: 1, height: 1))
@@ -103,6 +107,7 @@ final class GameScene: SKScene {
         setupBackground()
         setupPlayer()
         setupLighting()
+        setupMotes()
         hud = HUD(scene: self)
         cam.addChild(hud.root)
         gradeNode.blendMode = .multiply; gradeNode.zPosition = 500; gradeNode.alpha = 1
@@ -149,6 +154,8 @@ final class GameScene: SKScene {
 
     func setupBackground() {
         skyNode = SKSpriteNode(color: .black, size: CGSize(width: 10, height: 10)); skyNode.zPosition = -100
+        let u = skyUniforms
+        skyNode.shader = SKShader(source: GameScene.skyShader, uniforms: [u.day, u.dusk, u.under, u.cam, u.res])
         cam.addChild(skyNode)
         starsNode = SKSpriteNode(texture: assets.stars); starsNode.zPosition = -99; starsNode.alpha = 0
         cam.addChild(starsNode)
@@ -159,9 +166,60 @@ final class GameScene: SKScene {
             let b = SKSpriteNode(texture: assets.mountains1); b.anchorPoint = CGPoint(x: 0, y: 0); b.zPosition = -96; b.colorBlendFactor = 1
             cam.addChild(a); cam.addChild(b); mountainsA.append(a); mountainsB.append(b); _ = i
         }
-        for i in 0..<10 {
-            let c = SKSpriteNode(texture: Assets.sub(assets.clouds, (i % 3) * 64, 0, 64, 32)); c.zPosition = -95; c.alpha = 0.8
-            c.setScale(CGFloat.random(in: 1.5...3)); cam.addChild(c); cloudNodes.append(c); cloudOffsets.append(CGFloat.random(in: 0...2000))
+    }
+
+    static let skyShader = """
+    void main() {
+        vec2 px = floor(v_tex_coord * u_res / 3.0) * 3.0 / u_res;   // 3pt blocks, like the art
+        float t = u_time;
+        vec3 top = mix(vec3(0.02, 0.03, 0.08), vec3(0.04, 0.14, 0.22), u_day);
+        vec3 bot = mix(vec3(0.05, 0.04, 0.12), vec3(0.16, 0.46, 0.50), u_day) + vec3(0.30, 0.06, 0.24) * u_dusk;
+        vec3 col = mix(bot, top, px.y);
+        float x = px.x * 2.5 + u_cam;
+        float a = 0.0;
+        for (int i = 0; i < 3; i++) {
+            float fi = float(i);
+            float edge = 0.55 + fi * 0.1 + sin(x * 1.6 + fi * 2.1 + t * 0.06 * (fi + 1.0)) * 0.07 + sin(x * 4.1 - t * 0.1 + fi) * 0.025;
+            float d = px.y - edge;
+            float curtain = step(0.0, d) * exp(-d * 7.0);
+            float rays = 0.55 + 0.45 * sin(x * 38.0 + fi * 3.0 + t * 0.25);
+            a += curtain * rays * (0.55 - fi * 0.14);
+        }
+        vec3 aur = mix(vec3(0.30, 1.00, 0.78), vec3(0.72, 0.42, 1.00), clamp((px.y - 0.55) * 2.2, 0.0, 1.0));
+        col += aur * a * (0.15 + 0.85 * u_day);
+        col = floor(col * 20.0) / 20.0;
+        col = mix(col, vec3(0.05, 0.05, 0.08), u_under);
+        gl_FragColor = vec4(col, 1.0);
+    }
+    """
+
+    func setupMotes() {
+        motes.particleTexture = assets.pixel
+        motes.particleBirthRate = 7
+        motes.particleLifetime = 9; motes.particleLifetimeRange = 5
+        motes.particlePositionRange = CGVector(dx: 900, dy: 520)
+        motes.emissionAngle = .pi / 2; motes.emissionAngleRange = 0.7
+        motes.particleSpeed = 7; motes.particleSpeedRange = 5
+        motes.particleSize = CGSize(width: 2, height: 2)
+        motes.particleAlphaSequence = SKKeyframeSequence(keyframeValues: [0, 0.9, 0.5, 0], times: [0, 0.2, 0.7, 1])
+        motes.particleColorBlendFactor = 1
+        motes.particleColorRedRange = 0.25; motes.particleColorGreenRange = 0.25; motes.particleColorBlueRange = 0.25
+        motes.particleBlendMode = .add
+        motes.zPosition = 44                 // above the darkness: they are light
+        motes.targetNode = fxNode
+        fxNode.addChild(motes)
+        motes.advanceSimulationTime(10)
+    }
+
+    /// Mote color: teal-gold on the surface, the floor's own light below.
+    var moteColor: SKColor {
+        switch game.currentFloor {
+        case 5: return SKColor(red: 0.45, green: 1, blue: 0.55, alpha: 1)
+        case 6: return SKColor(red: 1, green: 0.45, blue: 0.4, alpha: 1)
+        case 7: return SKColor(red: 0.45, green: 0.7, blue: 1, alpha: 1)
+        case 8: return SKColor(red: 0.75, green: 0.5, blue: 1, alpha: 1)
+        case 9: return SKColor(red: 1, green: 0.97, blue: 0.85, alpha: 1)
+        default: return SKColor(red: 0.45, green: 0.95, blue: 0.85, alpha: 1)
         }
     }
 
@@ -169,6 +227,7 @@ final class GameScene: SKScene {
     func layoutBackground() {
         let w = size.width, h = size.height
         skyNode.size = CGSize(width: w + 4, height: h + 4)
+        skyUniforms.res.vectorFloat2Value = vector_float2(Float(w + 4), Float(h + 4))
         starsNode.size = CGSize(width: w + 4, height: h + 4)
         for (i, m) in mountainsA.enumerated() { m.size = CGSize(width: 768, height: 240); _ = i }
         for m in mountainsB { m.size = CGSize(width: 768, height: 240) }
@@ -407,8 +466,8 @@ final class GameScene: SKScene {
         let dl = CGFloat(game.dayLight)
         // Nael has no sun: the sky is skymist, teal when the heart beats strong, violet as it fades
         let dusk = max(0, 1 - abs(dl - 0.3) * 4)
-        let r = (10 + dl * 40 + dusk * 90) / 255, g = (12 + dl * 150 + dusk * 30) / 255, b = (30 + dl * 140 + dusk * 80) / 255
-        skyNode.color = SKColor(red: r, green: g, blue: b, alpha: 1)
+        skyUniforms.day.floatValue = Float(dl); skyUniforms.dusk.floatValue = Float(dusk)
+        skyUniforms.cam.floatValue = Float(cam.position.x / 4000)
         starsNode.alpha = max(0, (0.45 - dl) * 1.6)
         let w = size.width, h = size.height
         let ang = CGFloat(game.worldTime - 0.25) * .pi * 2
@@ -429,20 +488,13 @@ final class GameScene: SKScene {
         }
         place(mountainsA, par: 0.12, baseY: h * 0.25 + 10, tint: tintA)
         place(mountainsB, par: 0.25, baseY: h * 0.12, tint: tintB)
-        for (i, c) in cloudNodes.enumerated() {
-            cloudOffsets[i] += CGFloat(dt) * (6 + CGFloat(i) * 1.5)
-            let span = w + 400
-            var x = (cloudOffsets[i] - camX * 0.3).truncatingRemainder(dividingBy: span)
-            if x < 0 { x += span }
-            c.position = CGPoint(x: x - w / 2 - 200, y: h * 0.18 + CGFloat(i % 5) * h * 0.06 - camY * 0.05)
-            c.alpha = 0.35 + dl * 0.5
-        }
         // underground: fade the sky background to cave darkness
         let depth = CGFloat(game.player.y - Double(game.world.surfaceAt(Int(game.player.x))))
         let under = max(0, min(1, (depth - 6) / 14))
         for n in mountainsA + mountainsB { n.alpha = 1 - under }
-        for c in cloudNodes { c.alpha = (0.35 + dl * 0.5) * (1 - under) }
-        if under > 0 { skyNode.color = SKColor(red: r * (1 - under) + 0.05 * under, green: g * (1 - under) + 0.05 * under, blue: b * (1 - under) + 0.08 * under, alpha: 1) }
+        skyUniforms.under.floatValue = Float(under)
+        motes.position = playerNode.position
+        motes.particleColor = moteColor
     }
 
     // MARK: entities
@@ -634,7 +686,7 @@ final class GameScene: SKScene {
         let lines = [
             ["대장장이: 붉은 빛이 돌을 데우면 그 속의 금이 보인다고 하더군.", "대장장이: 용암 옆에 서려면 붉은 빛을 들어. 그게 전부야."],
             ["원예사: 초록 빛 아래선 덩굴이 벽을 타고 자라. 길이 없으면 길을 키워.", "원예사: 병 속 이끼가 젖어 있어야 해. 물을 찾아."],
-            ["우물지기: 물의 층엔 벽처럼 선 물이 있어. 푸른 빛이면 지나갈 수 있지.", "우물지기: 옛 사람들은 하늘이 땅 밑에서 온다고 했어. 그래서 우리가 여기 있는 거야."],
+            ["우물지기: 7층엔 벽처럼 선 물이 있어. 푸른 빛이면 지나갈 수 있지.", "우물지기: 옛 사람들은 하늘이 땅 밑에서 온다고 했어. 그래서 우리가 여기 있는 거야."],
         ]
         let set = lines[i % 3]
         return set[Int(game.storyT / 7) % set.count]

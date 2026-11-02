@@ -18,8 +18,8 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-  <key>CFBundleName</key><string>Pixel Earth</string>
-  <key>CFBundleDisplayName</key><string>Pixel Earth</string>
+  <key>CFBundleName</key><string>나엘</string>
+  <key>CFBundleDisplayName</key><string>나엘</string>
   <key>CFBundleIdentifier</key><string>com.leeo.pixelearth</string>
   <key>CFBundleVersion</key><string>1</string>
   <key>CFBundleShortVersionString</key><string>0.1</string>

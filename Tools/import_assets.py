@@ -479,4 +479,6 @@ if __name__ == '__main__':
     sys.path.insert(0, HERE); import gen_original_art; gen_original_art.OUT = OUT; gen_original_art.main()
     # The second bundle (Tools/source_art/bundle) replaces the keeper, the light-starved and the junction drawn above.
     import import_bundle; import_bundle.OUT = OUT; import_bundle.main()
+    # Nael (Tools/source_art/nael) replaces the Earth-like sky, horizon and small creatures.
+    import import_nael; import_nael.OUT = OUT; import_nael.main()
     print('wrote', OUT)

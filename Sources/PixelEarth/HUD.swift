@@ -417,12 +417,12 @@ final class HUD {
         let dim = SKSpriteNode(color: SKColor(white: 0, alpha: 0.7), size: CGSize(width: 4000, height: 4000)); dim.name = "dim"; n.addChild(dim)
         let p = makePanel(width: 560, height: 300); n.addChild(p)
         let t = label("빛의 심장이 깨어났다", size: 18, color: SKColor(red: 1, green: 0.95, blue: 0.8, alpha: 1), align: .center); t.position = CGPoint(x: 0, y: 110); n.addChild(t)
-        let lines = ["그들은 빛기둥을 깨고 하늘로 오르던 빛을 여기 붙잡았다. 그래서 위는 어두워졌고, 아래는 밝아졌다.",
-                     "빛을 위로 돌려보내면 기둥이 이어져 무너진 암석이 부서지고, 올라가는 길이 열린다. 캠프 사람들이 따라올 것이다.",
-                     "빛을 여기 남기면 지하 도시가 새 집이 된다. 하늘은 꺼진 채로."]
+        let lines = ["그는 하늘을 장부에 적고 창고에 가뒀다. 그래서 위는 어두워졌고, 창고 안도 어두웠다.",
+                     "빛을 위로 돌려보내면 하늘은 다시 모두의 것이 된다. 무너진 암석이 부서지고, 캠프 사람들이 따라올 것이다.",
+                     "빛을 여기 남기면 하늘은 당신의 것이 된다. 위의 하늘은 꺼진 채로."]
         for (i, s) in lines.enumerated() { let l = label(s, size: 11.5, color: SKColor(white: 0.8, alpha: 1), align: .center); l.position = CGPoint(x: 0, y: 70 - CGFloat(i) * 22); n.addChild(l) }
-        let up = makeButton("빛을 위로 돌려보낸다 — 하늘을 되찾는다", name: "choice:up", width: 420, height: 36, fontSize: 13, accent: true); up.position = CGPoint(x: 0, y: -30); n.addChild(up)
-        let stay = makeButton("빛을 여기 남긴다 — 지하에 산다", name: "choice:stay", width: 420, height: 36, fontSize: 13); stay.position = CGPoint(x: 0, y: -80); n.addChild(stay)
+        let up = makeButton("빛을 위로 돌려보낸다 — 하늘을 모두에게", name: "choice:up", width: 420, height: 36, fontSize: 13, accent: true); up.position = CGPoint(x: 0, y: -30); n.addChild(up)
+        let stay = makeButton("빛을 여기 남긴다 — 하늘을 가진다", name: "choice:stay", width: 420, height: 36, fontSize: 13); stay.position = CGPoint(x: 0, y: -80); n.addChild(stay)
         root.addChild(n); choice = n
     }
 
@@ -433,10 +433,10 @@ final class HUD {
         let n = SKNode(); n.zPosition = 30
         let dim = SKSpriteNode(color: SKColor(white: 0, alpha: 0.6), size: CGSize(width: 4000, height: 4000)); dim.name = "dim"; n.addChild(dim)
         let p = makePanel(width: 520, height: 420); n.addChild(p)
-        let t = label("PIXEL EARTH", size: 30, color: SKColor(red: 1, green: 0.7, blue: 0.24, alpha: 1), font: HUD.fontMono, align: .center); t.position = CGPoint(x: 0, y: 160); n.addChild(t)
-        let shadow = label("PIXEL EARTH", size: 30, color: .black, font: HUD.fontMono, align: .center); shadow.position = CGPoint(x: 3, y: 157); shadow.zPosition = -1; n.addChild(shadow)
-        let s1 = label("별을 잃은 행성 나엘. 하늘의 마지막 빛을 병에 담아 들고 땅속으로 내려가,", size: 12, color: SKColor(white: 0.75, alpha: 1), align: .center); s1.position = CGPoint(x: 0, y: 122); n.addChild(s1)
-        let s2 = label("그 빛을 키워 하늘을 되찾는 이야기.", size: 12, color: SKColor(white: 0.75, alpha: 1), align: .center); s2.position = CGPoint(x: 0, y: 104); n.addChild(s2)
+        let t = label("NAEL", size: 30, color: SKColor(red: 1, green: 0.7, blue: 0.24, alpha: 1), font: HUD.fontMono, align: .center); t.position = CGPoint(x: 0, y: 160); n.addChild(t)
+        let shadow = label("NAEL", size: 30, color: .black, font: HUD.fontMono, align: .center); shadow.position = CGPoint(x: 3, y: 157); shadow.zPosition = -1; n.addChild(shadow)
+        let s1 = label("별을 잃은 작은 행성 나엘. 하늘의 마지막 빛을 병에 담아 들고 땅속으로 내려가,", size: 12, color: SKColor(white: 0.75, alpha: 1), align: .center); s1.position = CGPoint(x: 0, y: 122); n.addChild(s1)
+        let s2 = label("혼자만 가진 어른들을 만나며 하늘을 되찾는 이야기.", size: 12, color: SKColor(white: 0.75, alpha: 1), align: .center); s2.position = CGPoint(x: 0, y: 104); n.addChild(s2)
         var y: CGFloat = 60
         if hasSave { let b = makeButton("이어하기", name: "menu:continue", width: 300, height: 36, fontSize: 14, accent: true); b.position = CGPoint(x: 0, y: y); n.addChild(b); y -= 46 }
         let nb = makeButton("새 세계 만들기", name: "menu:new", width: 300, height: 36, fontSize: 14, accent: !hasSave); nb.position = CGPoint(x: 0, y: y); n.addChild(nb); y -= 46

@@ -16,6 +16,8 @@ no checkerboard pattern, no ground shadow, no text, no watermark, no signature
 
 ## 0순위 — 새 세계 '나엘'의 겉모습
 
+**받은 상태 (11월 2일)**: 별하늘, 물렁이, 날개막, 지형 두 겹은 `Tools/source_art/nael`로 넣었습니다(`Tools/import_nael.py`). 다섯 어른, 식생의 나뭇잎, 그림 하늘, 앱 아이콘은 그림체가 지금 게임(왕좌지기, 주인공)보다 단순해서 다시 받아야 합니다. 다시 받을 때는 `Sources/PixelEarth/Resources/king.png`를 참고 그림으로 함께 주세요.
+
 세계관이 별을 잃은 행성 나엘로 바뀌었습니다(`docs/STORY.md` 0절). 해가 없고, 하늘은 땅 밑 심장에서 올라온 청록·보랏빛 **빛안개**입니다.
 하늘색과 해 없애기는 코드로 이미 바꿨고, 아래 그림이 오면 지상이 지구처럼 보이지 않게 됩니다. 크기는 지금 파일과 같아서 받으면 이름 그대로 바꿔 끼우면 됩니다.
 
@@ -26,7 +28,7 @@ alien rogue planet with no sun, the sky lit from below by drifting teal and viol
 muted cold palette with teal, violet and pale gold accents, nothing that looks like Earth
 ```
 
-### N1. 빛안개 커튼 (구름 자리) — `clouds.png`
+### N1. ~~빛안개 커튼 — `clouds.png`~~ 필요 없음: 하늘을 셰이더로 직접 그립니다 (`GameScene.skyShader`)
 192×32px, 64×32 조각 3개 가로 한 줄. 하늘에 천천히 흘러가며 겹쳐 보입니다. 거의 흰색으로 그리면 코드에서 밝기를 조절합니다.
 
 ```
@@ -99,6 +101,48 @@ pulled down into a glowing crack in the ground, strong silhouette readable at sm
 A ceiling painting for a 2D underground pixel art game, 64x48 pixels, seamless horizontally,
 a child's naive painting of teal and violet aurora curtains made with coloured stone dust on dark rock,
 uneven brush strokes, one curtain fold still wet and shiny, a tiny handprint at the bottom edge, no clouds, no blue sky.
+```
+
+### 층의 어른 다섯 (N9~N13)
+> **바뀜**: 어른들이 사람이 아닌 생명(서랍달팽이, 여섯팔두더지, 물집게, 큰눈원숭이, 까치)이 되었습니다. 캐릭터 그림은 `docs/CHARACTERS.md`의 프롬프트를 쓰고, 아래 프롬프트는 쓰지 않습니다.
+
+지금은 다섯 층 주인이 모두 같은 왕좌지기 그림에 색만 입혀 씁니다. 동화의 어른마다 얼굴이 따로 있어야 합니다(`docs/STORY.md` 2절).
+모두 같은 규격으로 받습니다. 게임 크기 72×66px, **5프레임 가로 한 줄**(제자리에서 천천히 숨쉬기), 오른쪽을 봅니다. 8배면 프레임당 576×528.
+아래 문장을 다섯 장 모두에 붙여 주세요.
+
+```
+storybook fairy-tale mood, a lonely gentle grown-up, not a monster, sad rather than scary,
+large readable silhouette, 5 frames in one row of a slow idle breathing loop, each frame 72x66 pixels, facing right
+```
+
+**N9. 내일을 지키는 사람 (5층, 초록)** — `lord5.png`
+```
+A thin old gardener in a long moss-green coat standing beside a tall wooden cabinet with dozens of tiny drawers,
+holding a small seed pouch close to the chest, a pocket watch on a chain, tiny sprouts at the feet, soft green glow.
+```
+
+**N10. 쉬지 않는 사람 (6층, 붉은)** — `lord6.png`
+```
+A stooped miner with sleeves rolled up, a pickaxe raised mid-swing, a lamp helmet, sweat drops,
+a half-carved wingless bird of red stone tied to the belt, warm red glow from cracks in the rock behind.
+```
+
+**N11. 벽을 세운 사람 (7층, 푸른)** — `lord7.png`
+```
+A tall woman in a blue shawl standing inside a rising wall of water, one hand raised to hold the water up,
+the other hand holding two small teacups, a bundle of dried herbs at her waist, calm sad eyes, cool blue glow.
+```
+
+**N12. 눈을 감은 사람 (8층, 보랏빛)** — `lord8.png`
+```
+A gaunt figure in a dark violet market-keeper's coat, eyes peacefully closed, one hand cupped behind an ear as if listening,
+an extinguished lantern hanging from the other hand, a thin wisp of smoke, very dim violet rim light.
+```
+
+**N13. 하늘을 가진 사람 (9층, 흰)** — `lord9.png`
+```
+A small round man in a too-large white and gold coat sitting on a stack of ledgers like a throne,
+a huge leather ledger open on his lap, a ring of heavy keys at his belt, behind him a vault door with pale light leaking through the seams.
 ```
 
 ## 받은 것 (적용 끝)

@@ -398,13 +398,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "It ended as the Sky-Taker wished. Now, up above, they will call you the one who stole the sky."
+            "value" : "The sky stays below. Now the grown-ups above will write your name in their ledgers: the one who owns the sky."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "그가 바란 대로 되었다. 이제 위에서는 당신을 하늘을 훔친 자라 부를 것이다."
+            "value" : "하늘은 아래에 남았다. 이제 위의 어른들은 장부에 당신 이름을 적을 것이다. 하늘을 가진 사람이라고."
           }
         }
       }
@@ -415,13 +415,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "For the children of floor 9 the sky becomes a picture again. Still, people are waiting for you above."
+            "value" : "The vault is open. For the first time he closes his ledger and looks up. He writes nothing."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "9층 아이들의 하늘은 다시 그림이 된다. 그래도 위에는 당신을 기다리는 사람들이 있다."
+            "value" : "창고 문이 열렸다. 그는 처음으로 장부를 덮고 하늘을 올려다본다. 아무것도 적지 않는다."
           }
         }
       }
@@ -432,13 +432,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Floor 5, Rift Forest"
+            "value" : "Floor 5, Tomorrow Forest"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "5층 균열의 숲"
+            "value" : "5층 내일의 숲"
           }
         }
       }
@@ -466,13 +466,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Floor 6, Red Edge"
+            "value" : "Floor 6, Restless Mine"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "6층 붉은 가장자리"
+            "value" : "6층 쉬지 않는 굴"
           }
         }
       }
@@ -500,13 +500,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Floor 7, Water Layer"
+            "value" : "Floor 7, House of Water Walls"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "7층 물의 층"
+            "value" : "7층 물벽의 집"
           }
         }
       }
@@ -534,13 +534,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Floor 8, The Dark"
+            "value" : "Floor 8, The Closed-Eye Dark"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "8층 어둠"
+            "value" : "8층 눈 감은 어둠"
           }
         }
       }
@@ -568,13 +568,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Floor 9, City of Light"
+            "value" : "Floor 9, The Sky Vault"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "9층 빛의 도시"
+            "value" : "9층 하늘 창고"
           }
         }
       }
@@ -1214,13 +1214,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The brightest afternoon of the skymist. Grandmother, the village’s last mist-keeper, hands you a small jar with a handful of sky breathing inside. “Don’t let it go out.”"
+            "value" : "The brightest afternoon of the skymist. Grandmother, the village’s last mist-keeper, hands you a small jar with a handful of sky breathing inside. “Don’t let it go out. And don’t keep it all to yourself.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "빛안개가 가장 밝은 오후. 마을의 마지막 안개지기인 할머니가 작은 병을 건넸다. 안에서 하늘 한 줌이 숨 쉬고 있다. “꺼뜨리지 마라.”"
+            "value" : "빛안개가 가장 밝은 오후. 마을의 마지막 안개지기인 할머니가 작은 병을 건넸다. 안에서 하늘 한 줌이 숨 쉬고 있다. “꺼뜨리지 마라. 그리고 혼자 갖지도 마라.”"
           }
         }
       }
@@ -1350,13 +1350,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The children of those left outside the door have come. To them this throne is the enemy’s seat."
+            "value" : "People tired of waiting have come. This time they will not wait for tomorrow."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "문 밖에 남겨졌던 이들의 자식들이 왔다. 그들에게 이 왕좌는 원수의 자리다."
+            "value" : "기다리다 지친 사람들이 왔다. 이번에는 내일까지 기다리지 않겠다고 한다."
           }
         }
       }
@@ -1367,13 +1367,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“That day my brother called my name through the door. One bolt, that was all. But behind me thirty children were holding their breath. I held the bolt.”"
+            "value" : "“Not yet. The wind is cold today. Tomorrow we plant. Tomorrow can’t be worse than today.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“그날 문 너머에서 동생이 내 이름을 불렀다. 빗장 하나만 풀면 됐다. 하지만 등 뒤에서 아이 서른이 숨을 죽이고 있었다. 나는 빗장을 붙들었다.”"
+            "value" : "“아직 아니다. 오늘은 바람이 차다. 내일 심자. 내일이 오늘보다 나쁠 리 없으니까.”"
           }
         }
       }
@@ -1384,13 +1384,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“There is a child in the forest with a scar on the brow. Tell them: the one who locked that door was me, not you.”"
+            "value" : "“Open the bottom drawer. There is one seed in it marked ‘today’. That one… plant it for me.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“숲에 이마에 흉터가 있는 아이가 있을 거다. 그 애에게 전해라. 그날 문을 잠근 건 너희가 아니라 나였다고.”"
+            "value" : "“맨 아래 서랍을 열어 봐라. ‘오늘’이라고 적힌 씨앗이 하나 있다. 그건… 네가 심어 다오.”"
           }
         }
       }
@@ -1401,13 +1401,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "the Door-Locker"
+            "value" : "the Keeper of Tomorrow"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "문을 잠근 자"
+            "value" : "내일을 지키는 사람"
           }
         }
       }
@@ -1418,13 +1418,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“He knocked three times. Hard, then softly, then with his nails. I still wake to that third sound.”"
+            "value" : "“If you open the drawers, the seeds will all spill out. Then everything would grow today. And what would be left for tomorrow?”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“동생은 문을 세 번 두드렸다. 처음엔 세게, 다음엔 약하게, 마지막엔 손톱으로. 나는 지금도 그 세 번째 소리에 잠을 깬다.”"
+            "value" : "“서랍을 열면 씨앗이 다 쏟아진다. 그러면 전부 오늘 자라 버리겠지. 그럼 내일엔 무엇이 남니?”"
           }
         }
       }
@@ -1435,13 +1435,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Up above they call the lord of floor 5 the Door-Locker: on the day of the collapse, they say, the door was locked from inside and people were left out."
+            "value" : "Up above, the grown-ups say the lord of floor 5 stole every seed in the forest and locked them in drawers. That is why the forest never grows."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "위의 사람들은 5층 주인을 문을 잠근 자라 부른다. 무너지던 날 통로의 문을 안에서 잠가 사람들을 밖에 버렸다고."
+            "value" : "위의 어른들은 5층 주인이 숲의 씨앗을 모두 훔쳐 서랍에 가뒀다고 한다. 그래서 숲이 자라지 않는다고."
           }
         }
       }
@@ -1452,13 +1452,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "That day the ceiling was falling outside the door, and his brother was out there. Inside were thirty children who had run to the forest. He sat with his back to the door until his brother went quiet. The children grew up in the forest of floor 5, and none of them ever said his name."
+            "value" : "He did not steal the seeds. He was saving them for the very best day. Today was a little cold; tomorrow might be a little better. So the drawers grew to a thousand, and the forest is still only sprouts. He knew that whatever blooms will one day fade."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "그날 문 밖에는 무너지는 천장과 그의 동생이 있었다. 문 안에는 숲으로 피한 아이 서른이 있었다. 그는 동생의 목소리가 그칠 때까지 문에 등을 대고 앉아 있었다. 그 뒤 5층 숲에서 아이들이 자랐고, 아무도 그의 이름을 부르지 않았다."
+            "value" : "그는 씨앗을 훔친 게 아니다. 가장 좋은 날에 심으려고 아껴 둔 것이다. 오늘은 조금 춥고, 내일은 조금 더 좋을 것 같았다. 그렇게 서랍이 천 개가 되었고, 숲은 아직 새싹이다. 피어난 것은 언젠가 진다는 것을, 그는 알고 있었다."
           }
         }
       }
@@ -1469,13 +1469,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The guild has sent people to take back the veins."
+            "value" : "People with even more to do have come. They mean to dig this mine faster and deeper."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "조합이 보낸 자들이 광맥을 되찾으러 왔다."
+            "value" : "할 일이 더 많은 사람들이 왔다. 이 굴을 더 빨리, 더 깊이 파겠다고 한다."
           }
         }
       }
@@ -1486,13 +1486,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“Three days after the cave-in we heard hammers above. We thought they were digging us out. They were nailing boards over the entrance.”"
+            "value" : "“I’m busy. Move. I have thirty-nine things to do. We can talk when they’re done.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“갱도가 무너지고 사흘째, 위에서 망치 소리가 들렸다. 우리를 꺼내러 온 줄 알았지. 입구에 판자를 박는 소리였다.”"
+            "value" : "“바쁘다. 비켜라. 할 일이 서른아홉 개다. 다 끝나면 그때 이야기하자.”"
           }
         }
       }
@@ -1503,13 +1503,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“Shine red light on the east wall. Thirty-nine names are carved there. Take the veins. Just never scrape off those names.”"
+            "value" : "“Shine red light on the east wall. There is a half-carved bird. It only needs wings. Who it was for… you find out for me.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“동쪽 벽을 붉은빛으로 비춰 봐라. 이름 서른아홉 개가 새겨져 있다. 광맥은 가져가라. 그 이름들만은 지우지 마라.”"
+            "value" : "“동쪽 벽을 붉은빛으로 비춰 봐라. 깎다 만 새가 한 마리 있다. 날개만 달아 주면 된다. 누구에게 주려 했는지는… 네가 알아내 다오.”"
           }
         }
       }
@@ -1520,13 +1520,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "the Red-Handed Miner"
+            "value" : "the Restless One"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "붉은 손의 광부"
+            "value" : "쉬지 않는 사람"
           }
         }
       }
@@ -1537,13 +1537,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“Until the last lamp died we took turns calling each other’s names. By the thirty-ninth name, I was the only one calling.”"
+            "value" : "“I can’t stop. If I stop, I’ll remember what I forgot.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“마지막 등불이 꺼질 때까지 우리는 돌아가며 서로의 이름을 불렀다. 서른아홉 번째 이름을 부를 때는 나 혼자였다.”"
+            "value" : "“멈추면 안 된다. 멈추면 생각이 난다. 내가 무엇을 잊었는지.”"
           }
         }
       }
@@ -1554,13 +1554,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "They say the lord of floor 6 is a thief who stole the ore veins and hid them in the rock. The guild above has put a hundred gold on that head."
+            "value" : "They say the lord of floor 6 digs day and night to keep every vein, and never shares a single red stone."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "6층 주인은 광맥을 훔쳐 돌 속에 숨긴 도둑이라 한다. 위의 조합은 그 목에 금 백 냥을 걸었다."
+            "value" : "6층 주인은 광맥을 혼자 차지하려고 밤낮없이 판다고 한다. 붉은 돌 한 조각도 나눠 주지 않는다고."
           }
         }
       }
@@ -1571,13 +1571,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When the shaft caved in, the guild sealed the entrance instead of digging. Guarding the ore was cheaper, they said. The one survivor carved thirty-nine names into the wall and hid the veins in the rock where only red light can see them, so no one above could come down to buy people again."
+            "value" : "Long ago he began digging red stone to carve a gift for someone. If the stone were a little better, a little bigger… so he kept digging. Now thirty-nine tasks are carved on the wall, and he no longer remembers who the gift was for."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "갱도가 무너지던 날 조합은 구조 대신 입구를 막았다. 남은 광석을 지키는 쪽이 싸다고 했다. 홀로 살아남은 그는 동료 서른아홉의 이름을 벽에 새기고, 붉은 빛 없이는 보이지 않도록 광맥을 돌 속에 감췄다. 위에서 다시는 사람을 사러 내려오지 못하게."
+            "value" : "아주 오래전 그는 누군가에게 줄 선물을 깎으려고 붉은 돌을 캐기 시작했다. 돌이 조금만 더 좋으면, 조금만 더 크면, 하고 계속 팠다. 이제 벽에는 해야 할 일이 서른아홉 줄 새겨져 있고, 그는 그 선물을 누구에게 주려 했는지 기억하지 못한다."
           }
         }
       }
@@ -1588,13 +1588,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hunters have come to tear down the veil. They still fear that sickness."
+            "value" : "People have come to build the wall higher. Even they do not know what they are afraid of."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "장막을 걷어 내려는 사냥꾼들이 왔다. 그들은 아직도 그 병을 두려워한다."
+            "value" : "벽을 더 높이 쌓으려는 사람들이 왔다. 무엇이 무서운지는 그들도 모른다."
           }
         }
       }
@@ -1605,13 +1605,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“The child only had a fever and a cough. Still, people gathered at the door with torches. That night I carried the child on my back and walked down into the water.”"
+            "value" : "“Don’t come closer. I’m not saying you’re bad. I only know that good things can bite too.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“그 아이는 열이 나서 기침을 했을 뿐이다. 그런데 사람들은 횃불을 들고 아이 집 앞에 모였지. 그날 밤 나는 아이를 업고 물속으로 걸어 내려왔다.”"
+            "value" : "“가까이 오지 마라. 네가 나쁘다는 게 아니다. 좋은 것도 물 수 있다는 걸 알 뿐이다.”"
           }
         }
       }
@@ -1622,13 +1622,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“Before the water falls, tell them past the veil to go deeper. This time I cannot carry them.”"
+            "value" : "“When the water falls, don’t clear away all twelve cots. Leave one. Someone hurt may come again.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“물이 내려앉기 전에 장막 너머에 알려 다오. 더 깊이 들어가라고. 이번에는 내가 업어 줄 수 없다고.”"
+            "value" : "“물이 내려앉거든 침상 열두 개를 다 치우지는 마라. 하나는 남겨 둬. 누가 또 다쳐서 올지 모르니.”"
           }
         }
       }
@@ -1639,13 +1639,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "the Mother of the Veil"
+            "value" : "the Wall-Builder"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "장막의 어머니"
+            "value" : "벽을 세운 사람"
           }
         }
       }
@@ -1656,13 +1656,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“Twelve coughing children are still past the veil. If I fall, the water falls with me. You know who will cross next, carrying torches.”"
+            "value" : "“Tear the wall down and someone will come in again. And one day bite me again. …Still, I never broke the habit of setting out two cups.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“장막 너머엔 아직 기침하는 아이가 열둘 있다. 내가 쓰러지면 물이 내려앉는다. 그다음 누가 횃불을 들고 건너올지 너도 알겠지.”"
+            "value" : "“벽을 허물면 누가 또 들어오겠지. 그리고 언젠가 또 나를 물겠지. …그래도 찻잔을 두 개 꺼내는 버릇은 못 고쳤다.”"
           }
         }
       }
@@ -1673,13 +1673,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "They say the lord of floor 7 is a witch who stood the water up to cut the road. Whoever goes past the veil never comes back."
+            "value" : "They say the lord of floor 7 is a grump who stood the water up like a wall so nobody can pass."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "7층 주인은 물을 세워 길을 끊은 마녀라 한다. 장막 너머로 간 사람은 돌아오지 않는다고."
+            "value" : "7층 주인은 물을 벽처럼 세워 아무도 못 지나가게 한 심술쟁이라 한다."
           }
         }
       }
@@ -1690,13 +1690,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When the sickness spread above, people drove everyone who coughed downward. She hid them on floor 7 and stood the water up like a wall so the hunters could not cross. People who went past the veil did not come back because they had found a place to live."
+            "value" : "She used to take in hurt things and let them sleep: a flier with a torn wing, a lost blob, a crying child. Once, something she took in bit her. From that day she stood the water up. The wall grew higher every year. One by one the healed climbed over it and left, and now she is alone inside."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "위에 돌림병이 돌자 사람들은 기침하는 이들을 아래로 몰아냈다. 그녀는 그들을 7층에 숨기고 물을 벽처럼 세워 쫓아온 이들이 건너지 못하게 했다. 장막 너머로 간 사람이 돌아오지 않은 것은, 거기서 살 곳을 찾았기 때문이다."
+            "value" : "그녀는 다친 것들을 데려와 재우는 사람이었다. 날개 찢긴 날짐승, 길 잃은 물렁이, 울던 아이. 한 번은 데려온 것이 그녀를 물었다. 그날부터 물을 세웠다. 벽은 해마다 높아졌다. 다 나은 것들은 하나씩 벽을 넘어 떠났고, 이제 벽 안에는 그녀 혼자다."
           }
         }
       }
@@ -1707,13 +1707,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Merchants have come to light the fires again. A market means money."
+            "value" : "People who find the dark comfortable have come. They want the lights to stay off."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "불을 다시 켜려는 상인들이 왔다. 시장이 다시 서면 돈이 되니까."
+            "value" : "어둠이 편한 사람들이 왔다. 다시는 불을 켜지 말라고 한다."
           }
         }
       }
@@ -1724,13 +1724,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“It was the brightest night the lantern market ever had. The children danced, each with a lamp. The things below saw that light and climbed up. By morning not one lamp was left.”"
+            "value" : "“What you can’t see isn’t there. It’s easier to believe that. Try covering your jar.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“등불 시장이 가장 밝던 밤이었다. 아이들이 등을 하나씩 들고 춤을 췄지. 그 빛을 보고 아래에서 그것들이 올라왔다. 아침에 남은 등은 하나도 없었다.”"
+            "value" : "“보이지 않으면 없는 거다. 그렇게 믿으면 편하다. 너도 병을 가려 봐라.”"
           }
         }
       }
@@ -1741,13 +1741,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“Your jar is too bright. If you hear children singing in the dark, follow them. They know the way without fire.”"
+            "value" : "“If you hear singing in the dark, follow it. Those are the children I looked away from. Now I follow them.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“네 병은 너무 밝다. 어둠 속에서 아이들 노랫소리가 들리면 따라가라. 그 애들은 불 없이도 길을 안다.”"
+            "value" : "“어둠 속에서 노랫소리가 들리면 따라가라. 내가 외면한 아이들이다. 이제는 내가 그 애들을 따라 걷는다.”"
           }
         }
       }
@@ -1758,13 +1758,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "the Lamp-Killer"
+            "value" : "the One with Closed Eyes"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "불을 끄는 자"
+            "value" : "눈을 감은 사람"
           }
         }
       }
@@ -1775,13 +1775,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“I put out the last lamp with my own hand. My daughter was holding it. When it went dark, they passed her by.”"
+            "value" : "“Even with my eyes shut, I could hear. If I covered my ears too… would there really be nothing then?”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“마지막 등은 내 손으로 껐다. 그 등을 들고 있던 건 내 딸이었다. 불이 꺼지자 그것들은 그 애를 그냥 지나쳐 갔다.”"
+            "value" : "“눈을 감아도 들리더라. 귀까지 막으면… 그때는 정말 아무것도 없을까.”"
           }
         }
       }
@@ -1792,13 +1792,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "They say the torches die on floor 8 because its lord laid a curse there."
+            "value" : "They say the torches die on floor 8 because its lord hates light."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "8층의 횃불이 꺼지는 것은 그 층 주인이 건 저주 때문이라 한다."
+            "value" : "8층의 횃불이 꺼지는 것은 그 층 주인이 빛을 미워해서라고 한다."
           }
         }
       }
@@ -1809,13 +1809,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Floor 8 once had a lantern market. On its brightest night, hungry things from below followed the light up and swallowed it. The survivor put out every flame and taught the children to find their way by sound. Up above, they called it a curse."
+            "value" : "Floor 8 once had a lantern market. It was bright, and the brighter it was, the more clearly you saw what you did not want to see: a child crying in a corner, people with no money for a lamp. He decided not to see. He put out the lights one by one, and at last he closed his own eyes. In the dark, for the first time, he heard. The crying was still there."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "8층에는 한때 등불 시장이 있었다. 가장 밝았던 밤, 더 아래의 굶주린 것들이 빛을 따라 올라와 시장을 삼켰다. 살아남은 그는 모든 불을 껐고, 아이들에게 어둠 속에서 소리로 길을 찾는 법을 가르쳤다. 위에서는 그것을 저주라 불렀다."
+            "value" : "8층에는 한때 등불 시장이 있었다. 시장은 밝았고, 밝은 만큼 보기 싫은 것도 잘 보였다. 구석에서 우는 아이, 등을 살 돈이 없는 사람. 그는 보지 않기로 했다. 불을 하나씩 껐고, 마지막엔 자기 눈을 감았다. 어둠 속에서 그는 처음으로 들었다. 우는 소리는 여전히 거기 있었다."
           }
         }
       }
@@ -1826,13 +1826,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "An army from above has come to take back the sky. To them, you are now the one who stole it."
+            "value" : "People have come to buy the sky. Your name is in their ledgers now."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "하늘을 되찾으러 위의 군대가 왔다. 그들 눈에는 이제 당신이 하늘을 훔친 자다."
+            "value" : "하늘을 사려는 사람들이 왔다. 그들 장부에는 이제 당신 이름이 적혀 있다."
           }
         }
       }
@@ -1843,13 +1843,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“Our children learned the sky from a painting, teal stone dust on the ceiling. When one asked if the real sky was this low too, I decided to break the pillar’s shell.”"
+            "value" : "“I bought the sky. It is written in my ledger, and what is written is real. And what do you own?”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“우리 아이들은 하늘을 그림으로 배웠다. 청록 돌가루로 천장에 칠한 빛안개. 한 아이가 진짜 하늘도 이렇게 낮으냐고 물었을 때, 나는 기둥의 껍질을 깨기로 했다.”"
+            "value" : "“나는 하늘을 샀다. 장부에 적혀 있다. 적혀 있는 건 진짜다. 너는 무엇을 가졌지?”"
           }
         }
       }
@@ -1860,13 +1860,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“Take it. But when you are up there, watch who laughs under that sky and who stands in line. And remember this city’s ceiling.”"
+            "value" : "“Take it. Owning it doesn’t let you see it. When you are up there… write only one thing in your ledger: who you watched that sky with.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“가져가라. 다만 올라가거든 그 하늘 아래에서 누가 웃고 누가 줄을 서는지 똑똑히 봐라. 그리고 이 도시의 천장을 기억해라.”"
+            "value" : "“가져가라. 가진다고 보이는 게 아니더라. 올라가거든… 그 하늘을 누구와 같이 봤는지, 그것만 장부에 적어라.”"
           }
         }
       }
@@ -1877,13 +1877,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "the Sky-Taker"
+            "value" : "the One Who Owns the Sky"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "하늘을 끌어내린 자"
+            "value" : "하늘을 가진 사람"
           }
         }
       }
@@ -1894,13 +1894,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“They sent their rubbish down here, their debts, their sick. But one piece of sky coming down, that they call theft.”"
+            "value" : "“Open the vault and the sky belongs to everyone again. Then I am nobody again.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“위에서는 쓰레기도, 빚도, 병든 사람도 이 도시로 내려보냈다. 그런데 하늘 한 조각이 내려온 것은 도둑질이라 하더군.”"
+            "value" : "“창고 문을 열면 하늘은 다시 모두의 것이 된다. 그럼 나는 다시 아무것도 아닌 사람이 된다.”"
           }
         }
       }
@@ -1911,13 +1911,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "They say the sky went out because the lord of floor 9 broke the light pillar and stole the sky."
+            "value" : "They say the sky went out because the lord of floor 9 stole it and locked it in a vault."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "하늘이 꺼진 건 9층 주인이 빛기둥을 깨고 하늘을 훔쳤기 때문이라 한다."
+            "value" : "하늘이 꺼진 건 9층 주인이 하늘을 훔쳐 창고에 가뒀기 때문이라 한다."
           }
         }
       }
@@ -1928,13 +1928,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The City of Light was built beside the light pillar by the people the world above threw away. Work, debt and sickness could all just be sent down. The heart’s light flowed past behind a shell of stone to become the sky up there; the children below never once touched it. He broke the shell and held the light. What Grandmother put in the jar was the last handful left in the sky."
+            "value" : "In the city below, children learned this: only what you own is yours. He had never owned anything, so he decided to own the biggest thing. He wrote ‘Sky: mine’ in his ledger, broke the light pillar and brought the sky into his vault. But the vault was dark inside. A sky that is owned shines for no one, not even its owner. What Grandmother put in the jar was the last handful that never went in."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "빛의 도시는 위에서 버린 사람들이 빛기둥 곁에 세운 도시였다. 일도, 빚도, 병도 아래로 내려보내면 그만이었다. 심장의 빛은 돌 껍질 너머로 흘러 위의 하늘이 될 뿐, 아래 아이들은 그 빛을 한 번도 만지지 못했다. 그는 껍질을 깨고 빛을 붙잡았다. 할머니가 병에 담은 빛은 하늘에 남은 마지막 한 줌이었다."
+            "value" : "아래 도시의 아이들은 이렇게 배웠다. 가진 것만 네 것이다. 그는 아무것도 가진 적이 없었다. 그래서 가장 큰 것을 갖기로 했다. 장부에 ‘하늘 — 내 것’이라 적고, 빛기둥을 깨 하늘을 창고에 들였다. 그런데 창고 안은 깜깜했다. 가진 하늘은 아무에게도, 그 자신에게도 빛나지 않았다. 할머니가 병에 담은 빛은 창고에 들어가지 않은 마지막 한 줌이었다."
           }
         }
       }
@@ -1945,13 +1945,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“I was the only one out of a burned village. Grab it before it is taken. That is all I learned.”"
+            "value" : "“Grab it before it’s taken. That’s what everyone does once they grow up.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“불탄 마을에서 혼자 살아남았다. 빼앗기기 전에 쥔다. 그게 내가 배운 전부다.”"
+            "value" : "“빼앗기기 전에 쥔다. 어른이 되면 다들 그렇게 한다.”"
           }
         }
       }
@@ -1979,13 +1979,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“I guarded the old lord. I will not forgive whoever took this seat.”"
+            "value" : "“I count. When I count the tribute, I feel calm.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“나는 옛 주인의 호위였다. 이 자리를 빼앗은 자는 용서하지 않는다.”"
+            "value" : "“나는 센다. 공물이 몇 개인지 세고 있으면 마음이 놓인다.”"
           }
         }
       }
@@ -2013,13 +2013,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“They took our hammers up there. Down here no one takes anything.”"
+            "value" : "“When I sit here, everyone looks up at me. That is enough.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“위에서 우리 망치를 빼앗았다. 여기서는 아무도 못 빼앗는다.”"
+            "value" : "“이 자리에 앉으면 다들 나를 올려다본다. 그거면 됐다.”"
           }
         }
       }
@@ -2047,13 +2047,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“Every rope ever lowered from above snapped halfway down.”"
+            "value" : "“Every promise sent down from above was for tomorrow.”"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“위에서 내려온 밧줄은 언제나 중간에 끊어졌다.”"
+            "value" : "“위에서 내려온 약속은 언제나 내일이었다.”"
           }
         }
       }
@@ -2285,13 +2285,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "What the world says"
+            "value" : "What the grown-ups say"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "세상이 하는 말"
+            "value" : "어른들이 하는 말"
           }
         }
       }
@@ -2319,13 +2319,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You hold this throne now. What do they call you up above?"
+            "value" : "You hold this throne now. What will the grown-ups above call you?"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "지금은 당신이 이 왕좌의 주인이다. 위에서는 당신을 어떻게 부를까."
+            "value" : "지금은 당신이 이 왕좌의 주인이다. 위의 어른들은 당신을 어떻게 부를까."
           }
         }
       }
@@ -2710,13 +2710,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rubble runs on past the door. Three scratches mark the wall, the first deep, the next shallow, the last barely there."
+            "value" : "Three tally marks are cut into the wall, the first deep, the next shallow, the last barely there. After that, nothing. The rest was left for tomorrow."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "문 너머로 무너진 돌무더기가 이어진다. 벽에 손톱으로 긁은 자국 세 줄이 남아 있다. 처음엔 깊게, 다음엔 얕게, 마지막은 겨우 보일 만큼."
+            "value" : "벽에 날짜를 세는 금이 세 줄 그어져 있다. 처음엔 깊게, 다음엔 얕게, 마지막은 겨우 보일 만큼. 그 뒤로는 하나도 없다. 내일 세기로 한 것이다."
           }
         }
       }
@@ -2727,13 +2727,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Side passage: beyond the door"
+            "value" : "Side passage: the counting wall"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "곁굴 · 문 너머의 통로"
+            "value" : "곁굴 · 날짜를 세던 벽"
           }
         }
       }
@@ -2744,13 +2744,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Names cover the wall, thirty-nine of them. The chisel marks grow clumsier toward the end, and the last space is empty."
+            "value" : "The wall is covered in tasks, thirty-nine lines, each crossed off but the last: ‘Give the bird to ○○.’ The name has worn away."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "벽 가득 이름이 새겨져 있다. 서른아홉 개. 끌 자국이 갈수록 서툴러지다가, 맨 아래 한 칸은 비어 있다."
+            "value" : "벽 가득 할 일이 새겨져 있다. 서른아홉 줄. 줄마다 끝냈다는 금이 그어져 있고, 맨 아래 한 줄만 그대로다. ‘○○에게 새를 주기.’ 이름 자리는 닳아서 읽을 수 없다."
           }
         }
       }
@@ -2761,13 +2761,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Side passage: the east wall"
+            "value" : "Side passage: the wall of tasks"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "곁굴 · 동쪽 벽"
+            "value" : "곁굴 · 할 일이 새겨진 벽"
           }
         }
       }
@@ -2778,13 +2778,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Twelve small cots stand by the water, each with a bundle of dried herbs at its head. They are still warm."
+            "value" : "Twelve small cots stand by the water, each with a bundle of dried herbs at its head. They are all empty, and all freshly made."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "물가에 작은 침상 열두 개가 놓여 있다. 머리맡마다 마른 약초가 한 묶음씩 걸려 있고, 침상은 아직 따뜻하다."
+            "value" : "물가에 작은 침상 열두 개가 놓여 있다. 머리맡마다 마른 약초가 한 묶음씩 걸려 있다. 침상은 모두 비었고, 모두 깨끗하다."
           }
         }
       }
@@ -2795,13 +2795,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Side passage: the house past the veil"
+            "value" : "Side passage: the house inside the wall"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "곁굴 · 장막 너머의 집"
+            "value" : "곁굴 · 벽 안의 집"
           }
         }
       }
@@ -2812,13 +2812,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "In a dark without a single lamp, children are singing. The song follows the wall further in."
+            "value" : "In a dark without a single lamp, children are singing. It is easier to hear with the jar covered. The song follows the wall further in."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "등불 하나 없는 어둠 속에서 아이들 노랫소리가 들린다. 노래는 벽을 따라 더 깊은 곳으로 이어진다."
+            "value" : "등불 하나 없는 어둠 속에서 아이들 노랫소리가 들린다. 병을 가리면 더 잘 들린다. 노래는 벽을 따라 더 깊은 곳으로 이어진다."
           }
         }
       }
@@ -2846,13 +2846,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The ceiling is painted with skymist in teal stone dust. One fold of the curtain is still wet, and under it is a small handprint."
+            "value" : "The ceiling is painted with skymist in teal stone dust. In one corner it says ‘our sky’; the word ‘our’ has been scrubbed out and written again many times. Under it is a small handprint."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "천장 가득 청록 돌가루로 빛안개가 칠해져 있다. 커튼 한 자락은 덜 마른 채이고, 그 아래 작은 손자국이 찍혀 있다."
+            "value" : "천장 가득 청록 돌가루로 빛안개가 칠해져 있다. 한구석에 ‘우리 하늘’이라 적혀 있는데, ‘우리’는 몇 번이나 지웠다가 다시 쓴 자국이다. 그 아래 작은 손자국이 찍혀 있다."
           }
         }
       }
@@ -3005,7 +3005,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@을 지켰다. 방어 %2$d회, 공물 %3$d개 추가. 다음은 더 어렵다."
+            "value" : "%1$@, 지켜 냈다. 방어 %2$d회, 공물 %3$d개 추가. 다음은 더 어렵다."
           }
         }
       }
@@ -3039,7 +3039,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@가 왕좌에서 일어선다."
+            "value" : "왕좌의 주인이 일어선다 — %@."
           }
         }
       }
@@ -3056,7 +3056,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@을 빼앗겼다. 이제 %2$@가 공물을 쥐고 다스린다."
+            "value" : "%1$@, 빼앗겼다. 새 주인은 %2$@. 공물도 그 손에 넘어갔다."
           }
         }
       }
@@ -3141,7 +3141,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@가 앉아 있다. 먼저 물리쳐야 한다."
+            "value" : "왕좌에 주인이 앉아 있다 — %@. 먼저 물리쳐야 한다."
           }
         }
       }
@@ -3175,7 +3175,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@의 빈 왕좌를 %2$@가 차지했다."
+            "value" : "%1$@의 빈 왕좌에 새 주인이 앉았다 — %2$@."
           }
         }
       }
@@ -3192,7 +3192,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@으로 침략군이 온다! 왕좌로 돌아가 막지 못하면 빼앗긴다."
+            "value" : "침략군이 온다 — %@! 왕좌로 돌아가 막지 못하면 빼앗긴다."
           }
         }
       }

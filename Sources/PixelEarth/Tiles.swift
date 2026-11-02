@@ -21,12 +21,12 @@ enum Layers {
     static let redTop = 176, blueTop = 206, darkTop = 236, cityTop = 262
     static func name(forY y: Int) -> String? {
         if y < bandTop - 40 { return nil }
-        if y < bandTop { return "4층 · 무너진 옛 통로" }
-        if y < redTop { return "5층 · 균열의 숲" }
-        if y < blueTop { return "6층 · 붉은 가장자리" }
-        if y < darkTop { return "7층 · 물의 층" }
-        if y < cityTop { return "8층 · 불이 꺼지는 어둠" }
-        return "9층 · 빛의 도시"
+        if y < bandTop { return "4층 · 소문의 길" }
+        if y < redTop { return "5층 · 내일의 숲" }
+        if y < blueTop { return "6층 · 쉬지 않는 굴" }
+        if y < darkTop { return "7층 · 물벽의 집" }
+        if y < cityTop { return "8층 · 눈 감은 어둠" }
+        return "9층 · 하늘 창고"
     }
     static func index(forY y: Int) -> Int {
         if y < bandTop { return max(1, 4 - (bandTop - y) / 14) }
