@@ -355,17 +355,6 @@ def glassify(im):
             if p[3] and max(p[:3]) - min(p[:3]) < 38 and 55 <= lum(p) <= 175: px[x, y] = (170, 215, 222, 80)
     return im
 
-def build_jar():
-    S = load('jar'); H = S.height; xs = [(4, 296), (303, 594), (601, 982), (990, 1372)]
-    out = Image.new('RGBA', (108, 40), CLEAR)
-    # Stage 0 jar, 1 lantern, 2 greenhouse pack: the strapped frame is the one that reads as worn on the back.
-    fr = [despeckle(key(S.crop((xs[j][0], 4, xs[j][1], H - 4))), 200) for j in (0, 1, 3)]
-    scale = min(min(36 / f.crop(f.getbbox()).width, 40 / f.crop(f.getbbox()).height) for f in fr)
-    for i, f in enumerate(fr):
-        g = fit(f, 36, 40, scale)
-        out.paste(glassify(g) if i < 2 else g, (i * 36, 0))
-    save(out, 'jar')
-
 def build_bug():
     """The bugs are pale specks on a dark checker, so they are picked out by brightness."""
     S = load('bug'); out = Image.new('RGBA', (8, 4), CLEAR)
@@ -472,7 +461,7 @@ if __name__ == '__main__':
     strip('zombie', 4, 20, 28, holes=30)
     strip('bat', 2, 24, 14)
     strip('king', 2, 72, 66)
-    build_core(); build_jar(); build_bug()
+    build_core(); build_bug()   # the jar is drawn in code from its contents (JarArt.swift)
     build_mountain('mountains0', m0); build_mountain('mountains1', m1)
     build_clouds(); build_stars(); build_ui()
     # The lords, the light-starved, the light shard and the light gauge are the game's own drawings, not the source sheets.

@@ -93,7 +93,7 @@ python3 Tools/import_assets.py          # Pillow 필요. Resources의 PNG를 덮
 ```
 
 원본에 없는 선인장, 코인, `glow.png`, `pixel.png`는 `Tools/placeholder_assets/`의 기존 그래픽을 씁니다.
-배경음악 `music.caf`는 `Tools/gen_music.py`가 합성한 64초 무한 반복 곡입니다(`python3 Tools/gen_music.py <폴더>` 뒤 `afconvert -f caff -d ima4 <폴더>/music.wav Sources/PixelEarth/Resources/music.caf`). 소리 켬/끔을 따릅니다.
+배경음악은 `Tools/gen_music.py`가 상황마다 하나씩 합성하는 무한 반복 곡 다섯입니다: 조용한 오후(`afternoon`), 꺼진 하늘(`lost`, 재앙 뒤 지상과 1~4층), 캠프(`camp`, 5층), 깊은 곳(`deep`, 6~9층, 심장 박동), 싸움(`fight`, 층의 주인과 왕좌 수비). `python3 Tools/gen_music.py <폴더>` 뒤 곡마다 `afconvert -f caff -d ima4 <폴더>/<곡>.wav Sources/PixelEarth/Resources/music_<곡>.caf`. 고르는 규칙은 `Game.musicMood`, 넘어가는 페이드는 `Sound`에 있고, 소리 켬/끔을 따릅니다.
 앱 아이콘은 `Tools/icon_art.png` 그림을 `python3 Tools/make_icon.py`가 macOS 규격의 둥근 모양으로 만듭니다.
 
 빛 조각 아이콘(`items.png` 50번 칸)과 빛의 그릇 게이지(`vessel.png`)는 `Tools/gen_original_art.py`가 직접 그립니다.

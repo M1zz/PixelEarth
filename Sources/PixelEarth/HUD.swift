@@ -85,7 +85,7 @@ final class HUD {
         }
         objectiveSkip.text = L("objective.skip")
         jarIconGlow.texture = assets.glow; jarIconGlow.size = CGSize(width: 90, height: 90); jarIconGlow.colorBlendFactor = 1; jarIconGlow.alpha = 0.5; jarIconGlow.name = "btn:jar"
-        jarIcon.texture = assets.jarFrames[0]; jarIcon.size = CGSize(width: 36, height: 40); jarIcon.name = "btn:jar"
+        jarIcon.size = CGSize(width: CGFloat(JarArt.w * 2), height: CGFloat(JarArt.h * 2)); jarIcon.name = "btn:jar"
         jarLabel.fontSize = 13; jarLabel.fontColor = SKColor(white: 0.85, alpha: 1); jarLabel.horizontalAlignmentMode = .left; jarLabel.verticalAlignmentMode = .center; jarLabel.name = "btn:jar"
         root.addChild(jarIconGlow); root.addChild(jarIcon); root.addChild(jarLabel)
         for (i, (name, symbol, text, key)) in [("btn:craft", "wrench.and.screwdriver", "button.craft", "E"), ("btn:inv", "bag", "button.bag", "I"), ("btn:jar", "sparkles", "button.jar", "J"), ("btn:reign", "crown", "button.reign", "R"), ("btn:map", "map", "button.map", "M"), ("btn:menu", "line.3.horizontal", "button.menu", "ESC")].enumerated() {
@@ -188,7 +188,7 @@ final class HUD {
         if game.frame % 15 == 0 { renderMinimap(game) }
         buttons.isHidden = menu != nil
         let jl = game.jar.light
-        jarIcon.texture = assets.jarFrames[game.jar.stage]
+        jarIcon.texture = JarArt.texture(game.jar, frame: [0, 1, 2, 1][Int(game.storyT * 2.2) % 4])
         updateObjective(game)
         updateHints(game)
         jarIconGlow.color = SKColor(red: CGFloat(jl.r) / 15, green: CGFloat(jl.g) / 15, blue: CGFloat(jl.b) / 15, alpha: 1)
@@ -341,53 +341,24 @@ final class HUD {
     func buildJarPanel(into n: SKNode, game: Game) {
         let jar = game.jar
         let p = makePanel(width: 560, height: 400); n.addChild(p)
-        let title = label(jar.named.uppercased() == jar.named ? "THE JAR" : "병", size: 14, color: SKColor(red: 1, green: 0.7, blue: 0.24, alpha: 1), font: HUD.fontMono); title.position = CGPoint(x: -260, y: 180); n.addChild(title)
+        let title = label(jar.named, size: 15, color: SKColor(red: 1, green: 0.7, blue: 0.24, alpha: 1)); title.position = CGPoint(x: -260, y: 180); n.addChild(title)
         let sub = label("\(jar.stageName) · \(jar.colorName) · 밝기 \(jar.brightness)/15", size: 11, color: SKColor(white: 0.7, alpha: 1)); sub.position = CGPoint(x: -260, y: 160); n.addChild(sub)
-        // --- the jar itself (left), drawn from its contents
-        let jx: CGFloat = -150, jy: CGFloat = -10
-        let gw: CGFloat = 150, gh: CGFloat = 220
+        // --- the jar itself (left): the same pixel picture as the HUD icon, large, breathing
+        let jx: CGFloat = -150, jy: CGFloat = -10, px: CGFloat = 8
         let l = jar.light
         let glowCol = SKColor(red: CGFloat(l.r) / 15, green: CGFloat(l.g) / 15, blue: CGFloat(l.b) / 15, alpha: 1)
-        let halo = SKSpriteNode(texture: assets.glow); halo.size = CGSize(width: 360, height: 360); halo.position = CGPoint(x: jx, y: jy); halo.color = glowCol; halo.colorBlendFactor = 1; halo.alpha = 0.25 + CGFloat(jar.brightness) / 15 * 0.4; halo.blendMode = .add; n.addChild(halo)
-        let glass = SKShapeNode(rect: CGRect(x: jx - gw / 2, y: jy - gh / 2, width: gw, height: gh), cornerRadius: 18)
-        glass.fillColor = SKColor(red: 0.75, green: 0.9, blue: 1, alpha: 0.10); glass.strokeColor = SKColor(red: 0.8, green: 0.9, blue: 1, alpha: 0.8); glass.lineWidth = 3; n.addChild(glass)
-        let lid = SKSpriteNode(color: SKColor(red: 0.53, green: 0.35, blue: 0.2, alpha: 1), size: CGSize(width: gw - 30, height: 16)); lid.position = CGPoint(x: jx, y: jy + gh / 2 + 6); n.addChild(lid)
-        // soil layers: colour from minerals
-        let soilH: CGFloat = 60 + CGFloat(jar.iron + jar.gold + jar.diamond) * 4
-        let soilBase = SKColor(red: 0.45 + CGFloat(jar.iron) * 0.06, green: 0.3 + CGFloat(jar.gold) * 0.05, blue: 0.2 + CGFloat(jar.diamond) * 0.08, alpha: 1)
-        let soil = SKShapeNode(rect: CGRect(x: jx - gw / 2 + 4, y: jy - gh / 2 + 4, width: gw - 8, height: soilH), cornerRadius: 12); soil.fillColor = soilBase; soil.strokeColor = .clear; n.addChild(soil)
-        for i in 0..<(jar.iron + jar.gold + jar.diamond) {
-            let fleck = SKSpriteNode(texture: assets.pixel); fleck.size = CGSize(width: 4, height: 4); fleck.colorBlendFactor = 1
-            fleck.color = i < jar.iron ? SKColor(red: 0.85, green: 0.55, blue: 0.35, alpha: 1) : (i < jar.iron + jar.gold ? SKColor(red: 1, green: 0.85, blue: 0.3, alpha: 1) : SKColor(red: 0.5, green: 0.95, blue: 1, alpha: 1))
-            fleck.position = CGPoint(x: jx - gw / 2 + 14 + CGFloat((i * 37) % Int(gw - 28)), y: jy - gh / 2 + 10 + CGFloat((i * 23) % Int(soilH - 12))); n.addChild(fleck)
-        }
-        // water line
-        if jar.water > 0.2 {
-            let wl = SKShapeNode(rect: CGRect(x: jx - gw / 2 + 4, y: jy - gh / 2 + 4 + soilH, width: gw - 8, height: CGFloat(jar.water) * 2.5)); wl.fillColor = SKColor(red: 0.3, green: 0.55, blue: 0.95, alpha: 0.35); wl.strokeColor = .clear; n.addChild(wl)
-        }
-        // moss blobs
-        let mossN = Int(jar.moss)
-        for i in 0..<mossN {
-            let m = SKShapeNode(circleOfRadius: 6 + CGFloat(i % 3) * 2); m.fillColor = SKColor(red: 0.25, green: 0.6 + CGFloat(l.g) / 60, blue: 0.3, alpha: 0.9); m.strokeColor = .clear
-            m.position = CGPoint(x: jx - gw / 2 + 16 + CGFloat((i * 41) % Int(gw - 32)), y: jy - gh / 2 + 6 + soilH + CGFloat((i * 13) % 10)); n.addChild(m)
-        }
-        // spore plants
-        let plants: [(Bool, Int)] = [(jar.sporeR, Tile.redPlant), (jar.sporeG, Tile.greenPlant), (jar.sporeB, Tile.bluePlant)]
-        var px: CGFloat = jx - 40
-        for (has, tile) in plants where has {
-            let sp = itemIcon(tile, size: 40); sp.position = CGPoint(x: px, y: jy - gh / 2 + soilH + 24); n.addChild(sp)
-            let g = SKSpriteNode(texture: assets.glow); g.size = CGSize(width: 90, height: 90); g.position = sp.position; g.colorBlendFactor = 1; g.blendMode = .add; g.alpha = 0.35
-            g.color = tile == Tile.redPlant ? SKColor(red: 1, green: 0.3, blue: 0.4, alpha: 1) : (tile == Tile.greenPlant ? SKColor(red: 0.4, green: 1, blue: 0.5, alpha: 1) : SKColor(red: 0.4, green: 0.7, blue: 1, alpha: 1)); n.addChild(g)
-            px += 40
-        }
+        let halo = SKSpriteNode(texture: assets.glow); halo.size = CGSize(width: 380, height: 380); halo.position = CGPoint(x: jx, y: jy); halo.color = glowCol; halo.colorBlendFactor = 1; halo.alpha = 0.25 + CGFloat(jar.brightness) / 15 * 0.4; halo.blendMode = .add; n.addChild(halo)
+        let frames = JarArt.frames(jar)
+        let art = SKSpriteNode(texture: frames[0]); art.size = CGSize(width: CGFloat(JarArt.w) * px, height: CGFloat(JarArt.h) * px); art.position = CGPoint(x: jx, y: jy); n.addChild(art)
+        art.run(.repeatForever(.animate(with: [frames[0], frames[1], frames[2], frames[1]], timePerFrame: 0.45)))
         // bugs
         bugNodes = []
         for i in 0..<jar.gel {
             let b = SKSpriteNode(texture: assets.bugFrames[0]); b.size = CGSize(width: 8, height: 8); b.colorBlendFactor = 1; b.color = glowCol
-            b.position = CGPoint(x: jx + CGFloat.random(in: -50...50), y: jy + CGFloat.random(in: -40...80))
+            b.position = CGPoint(x: jx + CGFloat.random(in: -36...36), y: jy + CGFloat.random(in: -16...40))
             let wander = SKAction.repeatForever(SKAction.sequence([
-                SKAction.move(to: CGPoint(x: jx + CGFloat.random(in: -55...55), y: jy + CGFloat.random(in: -30...90)), duration: Double.random(in: 1.2...2.4)),
-                SKAction.move(to: CGPoint(x: jx + CGFloat.random(in: -55...55), y: jy + CGFloat.random(in: -30...90)), duration: Double.random(in: 1.2...2.4))]))
+                SKAction.move(to: CGPoint(x: jx + CGFloat.random(in: -36...36), y: jy + CGFloat.random(in: -16...40)), duration: Double.random(in: 1.2...2.4)),
+                SKAction.move(to: CGPoint(x: jx + CGFloat.random(in: -36...36), y: jy + CGFloat.random(in: -16...40)), duration: Double.random(in: 1.2...2.4))]))
             b.run(wander); n.addChild(b); bugNodes.append(b); _ = i
         }
         // --- right: what it does, and what you can feed it

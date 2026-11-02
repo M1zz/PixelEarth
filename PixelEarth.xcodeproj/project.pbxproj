@@ -19,6 +19,7 @@
 		726E10796FFE42478A6D4458 /* HUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6AFF2BE24E24B18E78B2D6 /* HUD.swift */; };
 		75DBFB8FFC7ADE19DF35B9F8 /* KeyHints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3018E9749B3E8F973D37E362 /* KeyHints.swift */; };
 		8F66C34EC81868EF49CDB1BB /* Lighting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5CCFA31C301C7D582656C7F /* Lighting.swift */; };
+		9542C4E63B9B1FB58F2314E7 /* JarArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D55072C0C6596FED39A59F8 /* JarArt.swift */; };
 		9F1C42E7B2EFD59B38D0E505 /* Tiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DCD2AF08BC496B81E286D31 /* Tiles.swift */; };
 		B4A9D8F6870D350EBB571CD6 /* Defense.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EDBEA6D4BAE23D6FD9F8CBA /* Defense.swift */; };
 		B7C2A29E34006E7719CF9F14 /* Reign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8A177F99626438AC50C0C3 /* Reign.swift */; };
@@ -33,6 +34,7 @@
 
 /* Begin PBXFileReference section */
 		06CC8980EBD94CB4606810B2 /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Resources; path = Sources/PixelEarth/Resources; sourceTree = SOURCE_ROOT; };
+		0D55072C0C6596FED39A59F8 /* JarArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JarArt.swift; sourceTree = "<group>"; };
 		1303FB7A619E1D3EC0C28423 /* ChunkRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkRenderer.swift; sourceTree = "<group>"; };
 		17B7163FA01365FC7966C9F8 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		2DCD2AF08BC496B81E286D31 /* Tiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tiles.swift; sourceTree = "<group>"; };
@@ -70,6 +72,7 @@
 				17B7163FA01365FC7966C9F8 /* GameScene.swift */,
 				8F6AFF2BE24E24B18E78B2D6 /* HUD.swift */,
 				FF82BF8412FD757945FE9040 /* Jar.swift */,
+				0D55072C0C6596FED39A59F8 /* JarArt.swift */,
 				ECE2EC3FC6039FB3F123C00A /* Junction.swift */,
 				3018E9749B3E8F973D37E362 /* KeyHints.swift */,
 				E5CCFA31C301C7D582656C7F /* Lighting.swift */,
@@ -201,6 +204,7 @@
 				5756D9FF8FF7EDC3789D006C /* GameScene.swift in Sources */,
 				726E10796FFE42478A6D4458 /* HUD.swift in Sources */,
 				ECF0BF59047484B77AF9AA99 /* Jar.swift in Sources */,
+				9542C4E63B9B1FB58F2314E7 /* JarArt.swift in Sources */,
 				05E2BD37735195B492867042 /* Junction.swift in Sources */,
 				75DBFB8FFC7ADE19DF35B9F8 /* KeyHints.swift in Sources */,
 				8F66C34EC81868EF49CDB1BB /* Lighting.swift in Sources */,

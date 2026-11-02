@@ -12,6 +12,15 @@ extension Game {
         9: "9층 · 하늘 창고 — 하늘이 여기 갇혀 있다. 어디선가 장부 넘기는 소리가 들린다.",
     ]
 
+    /// Which loop fits right now: a fight first, then the afternoon (before the disaster and once the sky is back),
+    /// then the place: the dark surface and floors 1-4, the camp floor, the deep floors.
+    var musicMood: MusicMood {
+        if boss != nil || defense != nil { return .fight }
+        if (act == 1 && !disasterStruck) || act == 5 { return .afternoon }
+        let f = currentFloor
+        return f <= 4 ? .lost : (f == 5 ? .camp : .deep)
+    }
+
     func updateStory(_ dt: Double) {
         storyT += dt
         skyFactor += (skyTarget - skyFactor) * min(1, dt * 0.15)

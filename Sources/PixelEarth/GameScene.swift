@@ -56,6 +56,7 @@ final class GameScene: SKScene {
     var revealNodes: [Int: SKSpriteNode] = [:]
     var npcNodes: [Int: SKNode] = [:]
     let coreNode = SKSpriteNode()
+    let grandmaNode = SKSpriteNode()
     let jarGlow = SKSpriteNode()
     var shake = 0.0
 
@@ -255,6 +256,8 @@ final class GameScene: SKScene {
         fxNode.addChild(jarGlow)
         coreNode.texture = assets.coreFrames[0]; coreNode.size = CGSize(width: 48, height: 48); coreNode.anchorPoint = CGPoint(x: 0.5, y: 0); coreNode.zPosition = 6
         entityNode.addChild(coreNode)
+        grandmaNode.size = CGSize(width: 20, height: 32); grandmaNode.anchorPoint = CGPoint(x: 0.5, y: 0); grandmaNode.zPosition = 8; grandmaNode.isHidden = true
+        entityNode.addChild(grandmaNode)
     }
 
     func setupLighting() {
@@ -390,6 +393,7 @@ final class GameScene: SKScene {
             game.input.mouseX = wm.x; game.input.mouseY = wm.y
             game.input.uiOpen = hud.panelOpen
             game.update(dt)
+            Sound.shared.mood = game.musicMood
         }
         // camera follows the player
         let target = scenePos(game.player.x + game.player.face * 1.5, game.player.y + game.player.h / 2)
@@ -552,9 +556,11 @@ final class GameScene: SKScene {
                 n.texture = assets.batFrames[Int(e.anim * 14) % 2]; n.size = CGSize(width: 24, height: 14)
             case .king:
                 // Breathes on the ground; stretched tall in the air, since the sheet has no leap pose.
-                n.texture = assets.kingFrames[e.ground ? Int(e.anim * 3) % assets.kingFrames.count : 0]
+                let founder = !e.isChallenger && e.generation == 1
+                let frames = (founder ? e.lordFloor.flatMap { assets.lordFrames[$0] } : nil) ?? assets.kingFrames
+                n.texture = frames[e.ground ? Int(e.anim * 3) % frames.count : 0]
                 n.size = CGSize(width: 72 * e.drawScale * (e.ground ? 1 : 0.92), height: 66 * e.drawScale * (e.ground ? 1 : 1.1))
-                if let f = e.lordFloor {
+                if founder { n.colorBlendFactor = 0 } else if let f = e.lordFloor {
                     let c = Reign.tint(f); n.color = SKColor(red: CGFloat(c.r) / 255, green: CGFloat(c.g) / 255, blue: CGFloat(c.b) / 255, alpha: 1); n.colorBlendFactor = 0.45
                 } else { n.colorBlendFactor = 0 }
             }
@@ -707,6 +713,15 @@ final class GameScene: SKScene {
                 n.run(bob)
                 entityNode.addChild(n); npcNodes[i] = n
             }
+        }
+        // Grandmother stands where she handed over the jar: on the quiet afternoon, and again once the sky is back.
+        let gx = game.spawnX - 2.5
+        grandmaNode.isHidden = !((game.act == 1 && !game.disasterStruck) || game.act == 5) || abs(gx - game.player.x) > 50
+        if !grandmaNode.isHidden {
+            let near = abs(gx - game.player.x) < 3.5
+            grandmaNode.texture = assets.grandmaFrames[near && Int(game.storyT * 1.5) % 3 == 0 ? 3 : Int(game.storyT * 2) % 3]
+            grandmaNode.position = scenePos(gx, Double(w.surfaceAt(Int(floor(gx)))))
+            grandmaNode.xScale = game.player.x < gx ? -1 : 1
         }
         coreNode.position = scenePos(Double(w.coreX) + 0.5, Double(w.coreY) + 1)
         coreNode.texture = assets.coreFrames[game.act >= 3 ? 1 : 0]

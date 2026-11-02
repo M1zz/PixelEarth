@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>나엘 — 이야기 지도</title>
+<style>
+  :root {
+    --bg: #0b0f1c; --panel: #131a2c; --line: #24304a; --text: #dfe6f2; --dim: #8c98b0;
+    --teal: #4fe3c8; --violet: #a77bff; --gold: #ffc96b;
+    --f5: #7fe89a; --f6: #ff7a6b; --f7: #7fb8ff; --f8: #b48cff; --f9: #fff4dc; --up: #9aa6bd;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 -apple-system, "Apple SD Gothic Neo", "Pretendard", sans-serif; }
+  img.px { image-rendering: pixelated; }
+  header { padding: 56px 24px 32px; text-align: center; background: radial-gradient(ellipse at 50% 120%, #1d4b55 0%, transparent 60%), linear-gradient(#070a14, var(--bg)); position: relative; overflow: hidden; }
+  header .aurora { position: absolute; inset: 0; opacity: .5; background:
+      repeating-linear-gradient(100deg, transparent 0 40px, rgba(79,227,200,.08) 40px 70px, transparent 70px 120px),
+      repeating-linear-gradient(80deg, transparent 0 60px, rgba(167,123,255,.07) 60px 90px, transparent 90px 150px);
+      mask-image: linear-gradient(transparent, #000 30%, transparent 80%); animation: drift 18s linear infinite; }
+  @keyframes drift { to { background-position: 400px 0, -300px 0; } }
+  header h1 { margin: 0; font-size: 44px; letter-spacing: .3em; color: var(--gold); position: relative; }
+  header p { margin: 8px 0 0; color: var(--dim); position: relative; }
+  header blockquote { margin: 24px auto 0; max-width: 560px; font-size: 18px; color: #fff; position: relative; }
+  main { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
+  h2 { font-size: 22px; margin: 64px 0 6px; }
+  h2 small { font-size: 14px; color: var(--dim); font-weight: normal; margin-left: 8px; }
+  .lead { color: var(--dim); margin: 0 0 20px; }
+  .badge { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 99px; border: 1px solid var(--line); color: var(--dim); vertical-align: middle; }
+  .badge.in { border-color: #2e7d6b; color: var(--teal); }
+
+  /* ---- cross-section */
+  .atlas { display: grid; grid-template-columns: minmax(320px, 440px) 1fr; gap: 28px; align-items: start; }
+  .planet { position: relative; }
+  .layer { position: relative; display: flex; align-items: center; gap: 12px; padding: 0 16px; height: 56px; border-left: 4px solid var(--c); cursor: pointer;
+           background: linear-gradient(90deg, color-mix(in srgb, var(--c) 16%, transparent), transparent 75%); margin-bottom: 3px; border-radius: 0 10px 10px 0; transition: transform .15s, background .15s; }
+  .layer:hover, .layer.on { transform: translateX(6px); background: linear-gradient(90deg, color-mix(in srgb, var(--c) 32%, transparent), transparent 85%); }
+  .layer .n { width: 34px; color: var(--c); font-weight: 700; }
+  .layer .t { flex: 1; }
+  .layer .t b { display: block; font-size: 15px; }
+  .layer .t span { font-size: 12px; color: var(--dim); }
+  .layer img { height: 54px; }
+  .sky, .heart { text-align: center; padding: 14px; border-radius: 14px; margin-bottom: 8px; }
+  .sky { background: linear-gradient(180deg, rgba(167,123,255,.25), rgba(79,227,200,.25)); }
+  .heart { background: radial-gradient(circle, rgba(255,244,220,.35), transparent 70%); margin-top: 8px; cursor: pointer; }
+  .pillar { position: absolute; right: 26px; top: 70px; bottom: 90px; width: 6px; border-radius: 3px; background: linear-gradient(var(--teal), var(--f9)); opacity: .5; }
+  .band { text-align: center; font-size: 12px; color: var(--dim); margin: 6px 0; letter-spacing: .2em; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 24px; position: sticky; top: 20px; min-height: 520px; }
+  .card .head { display: flex; gap: 18px; align-items: center; }
+  .card .head img { height: 132px; background: radial-gradient(circle, color-mix(in srgb, var(--c) 30%, transparent), transparent 70%); border-radius: 12px; }
+  .card h3 { margin: 0; font-size: 22px; color: var(--c); }
+  .card .kind { color: var(--dim); font-size: 13px; }
+  .card dl { margin: 18px 0 0; display: grid; grid-template-columns: 92px 1fr; gap: 10px 14px; }
+  .card dt { color: var(--dim); font-size: 13px; padding-top: 2px; }
+  .card dd { margin: 0; }
+  .card .quote { color: #fff; font-style: normal; }
+  .card .rumor { color: #e8a5a5; }
+
+  /* ---- flow */
+  .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  .step { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; position: relative; }
+  .step .act { font-size: 12px; color: var(--gold); letter-spacing: .1em; }
+  .step h4 { margin: 4px 0 6px; font-size: 16px; }
+  .step p { margin: 0; font-size: 13px; color: var(--dim); }
+  .step:not(:last-child)::after { content: "→"; position: absolute; right: -14px; top: 40%; color: var(--dim); }
+  .fork { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+  .branch { border-radius: 14px; padding: 18px; border: 1px solid var(--line); }
+  .branch.up { background: linear-gradient(160deg, rgba(79,227,200,.14), transparent); }
+  .branch.stay { background: linear-gradient(160deg, rgba(167,123,255,.14), transparent); }
+  .branch h4 { margin: 0 0 8px; }
+  .branch ol { margin: 0; padding-left: 20px; color: var(--dim); font-size: 14px; }
+  .choice { text-align: center; margin-top: 14px; padding: 14px; border: 1px dashed var(--gold); border-radius: 14px; color: var(--gold); }
+
+  /* ---- relations */
+  .rel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 8px; }
+  .rel svg { width: 100%; height: auto; display: block; }
+  .rel text { fill: var(--text); font-size: 13px; }
+  .rel .lbl { fill: var(--dim); font-size: 11px; }
+  .rel .node rect { stroke-width: 1.5; rx: 10; }
+
+  /* ---- table */
+  table { width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 14px; overflow: hidden; }
+  th, td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--line); font-size: 14px; }
+  th { color: var(--dim); font-weight: 600; background: #10162a; }
+  td:first-child { white-space: nowrap; }
+  footer { color: var(--dim); font-size: 13px; text-align: center; margin-top: 60px; }
+  @media (max-width: 860px) { .atlas { grid-template-columns: 1fr; } .flow { grid-template-columns: 1fr 1fr; } .step::after { display: none; } .card { position: static; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="aurora"></div>
+  <h1>NAEL</h1>
+  <p>별을 잃은 작은 행성 나엘 — 이야기 지도</p>
+  <blockquote>“꺼뜨리지 마라. 그리고 혼자 갖지도 마라.”</blockquote>
+</header>
+<main>
+
+<h2>1. 아홉 겹의 세계 <small>겹을 누르면 그곳의 어른이 나온다</small></h2>
+<p class="lead">나엘에는 해가 없다. 하늘(빛안개)은 땅 밑 심장의 빛이 빛기둥을 타고 올라와 생긴다. 그래서 하늘을 되찾으려면 아래로 내려가야 한다. 겹마다 무언가 하나를 너무 꼭 쥔 어른이 한 사람씩 산다.</p>
+<div class="atlas">
+  <div class="planet" id="planet"></div>
+  <div class="card" id="card"></div>
+</div>
+
+<h2>2. 이야기의 흐름 <small>막 구조와 갈림길</small></h2>
+<p class="lead">내려갈 때는 싸워서 빼앗고, 올라갈 때는 나눠서 연다. 처음과 끝이 거울처럼 맞선다.</p>
+<div class="flow">
+  <div class="step"><div class="act">1막 · 오후</div><h4>하늘 한 줌</h4><p>빛안개가 가장 밝은 오후, 할머니가 병을 건넨다. 튜토리얼과 자유 시간.</p></div>
+  <div class="step"><div class="act">1막 · 재앙</div><h4>하늘이 꺼진다</h4><p>빛안개가 거꾸로 땅속으로 빨려 들어가고 발밑이 갈라진다. 뒤가 무너진다.</p></div>
+  <div class="step"><div class="act">2막 · 정착</div><h4>내일의 숲 캠프</h4><p>제단 셋에 붉은·초록·푸른 빛풀을 심으면 함께 떨어진 이웃 셋이 돌아온다.</p></div>
+  <div class="step"><div class="act">2막 · 하강</div><h4>다섯 어른</h4><p>5~9층의 주인을 쓰러뜨리고 왕좌에 앉는다. 이제 아이가 소문 속 악당이 된다.</p></div>
+  <div class="step"><div class="act">3막 · 심장</div><h4>하늘 창고</h4><p>병의 빛이 흰빛이 되고 캠프가 다 깨어나면 심장이 응답한다.</p></div>
+</div>
+<div class="choice">심장 앞의 선택 — 하늘을 모두에게 돌려줄까, 내가 가질까</div>
+<div class="fork">
+  <div class="branch up"><h4>하늘을 모두에게 <span class="badge in">게임에 있음</span></h4>
+    <ol><li>창고 문이 열리고 빛이 위로 흐른다. 무너진 암석이 부서진다.</li>
+      <li>올라갈수록 하늘이 밝아진다.</li>
+      <li>위의 어른 넷을 만난다. 싸우지 않고 병의 빛을 <b>나눠 주어</b> 길을 연다. <span class="badge">예정</span></li>
+      <li>지상에서 하늘. 할머니가 그 자리에 서 있다. “꺼뜨리지 않았구나.”</li></ol></div>
+  <div class="branch stay"><h4>하늘을 가진다 <span class="badge in">게임에 있음</span></h4>
+    <ol><li>빛은 아래에 남는다. 지하가 밝아지고 위의 하늘은 꺼진 채다.</li>
+      <li>위의 어른들은 장부에 아이의 이름을 적는다. 하늘을 가진 사람이라고.</li>
+      <li>할머니는 5층 캠프의 초록 제단 옆에 서 있다. <span class="badge">예정</span></li></ol></div>
+</div>
+
+<h2>3. 관계도 <small>끊어진 끈이 이어지는 것이 보상이다</small></h2>
+<p class="lead">아래 어른마다 캠프 사람이나 다른 인물과 끊어진 끈이 하나씩 있다. 위 어른들은 아래 어른들이 그렇게 된 원인이다.</p>
+<div class="rel" id="rel"></div>
+
+<h2>4. 끝과 그 뒤 <small>진실을 알아낸 어른만 한 줄씩</small></h2>
+<table>
+  <tr><th>어른</th><th>하늘을 모두에게</th><th>하늘을 가진다</th></tr>
+  <tr><td>내일을 지키는 사람</td><td>서랍을 모두 열고 오늘 심는다</td><td>서랍이 하나 더 늘어난다</td></tr>
+  <tr><td>쉬지 않는 사람</td><td>곡괭이를 내려놓고 돌 새에 날개를 단다</td><td>마흔 번째 할 일을 새긴다</td></tr>
+  <tr><td>벽을 세운 사람</td><td>찻잔 두 개 중 하나에 손님이 앉는다</td><td>물벽이 한 뼘 더 높아진다</td></tr>
+  <tr><td>눈을 감은 사람</td><td>눈을 뜨고 노래하는 아이들 곁에 선다</td><td>귀까지 막는다</td></tr>
+  <tr><td>하늘을 가진 사람 <span class="badge in">게임에 있음</span></td><td>장부를 덮고 하늘을 올려다본다. 아무것도 적지 않는다</td><td>장부에 당신 이름을 적는다</td></tr>
+</table>
+
+<footer>원본: docs/STORY.md · docs/CHARACTERS.md · Localizable.xcstrings — 이 페이지는 그 내용을 보여 주기만 한다.</footer>
+</main>
+
+<script>
+const IMG = {"lord5": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABCCAYAAAD0dpAhAAACPUlEQVR4nO2bP0/CQBjGr8aJeGlMWJgwcWGpMXHQRWYSWBh0cvA74IADE4k66MA3cHCSwUW/AH4BExYGFyYWEkNqWGsgENtq/92/3nu8v4SQXnotPHnufZ8egRAEQRAEQRAEQRAEQWBhEYCM35+98Fj59FzKd8l80UrJ/vPhWBlNZpYIcWSKxCRQcZdy33j65WYWKE4cWSJtESCMU4iT5by0bLNOtGkhcDxz56nHIAHGQXmBAskU6LZTZR7jZVKoEBUwdzGbswbxdrE4gU6ODqyNXGJlXwsvzUdK7sncxVSxd7zv0eJv7mrc3STOceqHS6cN3z6s3ASa/dOu045lYSGOO3WX73kAaonlAQiB6MpFeYBJGrKDnFWxZXWRf76xXSwtZ8WdwHF/+k02LknTCBeFxYkaUy7QdXfAPAYFrWtQkoteOtVYp4hwETiBVKN9ko5y0cI9ze5AWK0x1kH9mG4lopOBFshVkK6ZBbJpIfDKMsYb8tbLK84p6zHesAg6KFLfk76oYGjEEmsqzFWgknQeT/ra7kk7GWpH0oYaz84iyCWm0kVGCCQTkEla5d41OgiiQA5juIuqRTxhEfekITpIp45mnECiAZ+kZbtIyyTtCPi5JtzyWdO0sUuMCnKRsQKJwpgkLStda+cgR0D9EXld7QRqvV4IPc9fix69+4BI4WPtBWp/tr2HxlPiefVejaQ5Lzzn0rqy/PfyH4MQSBZG1SDd0O5XjWGKQFfv1byswW8xZyP+DoUgCDGJH7jXOxXZwuL2AAAAAElFTkSuQmCC", "lord6": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABCCAYAAAD0dpAhAAACE0lEQVR4nO2br1LDQBCHLx1msOh9AkwR0RgqalpRA4IadMQ9SRUiugqBqqCmAkwl02GoqQAH17cgTEphSilJk9zt3W32m8lMG9E/X3Z/m1xaIRiGYRgGi3h4m+h8vUAQFxRdXVT6juQFVZXVEISINctJORDEiSq2GAlBshMmJuR4LUhuSLkez1Yi4nOR6JTjXUjLrUr5FrOZP7rEeCNIZkgxLcdpQXJHC9nAKUHSESmbBD60UK2R/4xoV/DiaN3H7T8SW9EE5bM3fJSTtV83ex8FdXp8B9NFVyCSJeHssvfreXAUBVYrCKaLbipJIIFVId63mFeCALmKXMDZCmrlTKmHm9FqS7Mn3YYviZGWLBVsal1FGKGdlUUYo760IFi3my5J7U6vdAVMxqPAqRaDGmVRpQyCGogqLQiQTxpttJeWKQbEq8jZMU9KEFSsoioTzDRcQViCwEJomw7oFK6gHFhQDiwIS5Aiei6kNaQVoiSMgE7hFsMUBAQvO6z//KVd8Cx6sHz9ehA2k5PZ3L/zIDBYRT9y1jyHTeOXKN5k0GBLDpakwoLUHtVBKYsKZxBoXotevr85XevG3hY0X7z2Pw537jcd1F4t2ve3JGFMMetjvigYUrQt2isiQUxizNuC74vlwBWEcV9MEKayIMUtVu8c4gzy4c6qy3AFUV20x4IrKAdetHf9an7+9OjFH2oYRpTiE5AL6Dh8j3xZAAAAAElFTkSuQmCC", "lord7": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABCCAYAAAD0dpAhAAAB60lEQVR4nO2ZrVLDQBRGbzo8BQJsFQJMbSI2GoNA8wgVjSiCilb0EdAVGHQiGhsDAoVtRXUNKiJMO83MNtN2aZLd3A3fmdnJn0hy9tvNzSwRAAAAAAAAAAAA7MIhC1h9zLN8//LOM/rMji1iipwStUjC7Lrn1/JuHWoZiyTM5G1rBa0OpOdhFJ28Lkv5lwl6G4qj13TIsU6QaTnsJmnx8jVYxrNxfjyfHk+M148oHLt75+qWs+GCLCWU5OgQY8UQ8/rRthXPpWlqRI41CfIkSaaSY0WCishy/CCmrjuopdZpjSA/iPe2JnA4fLmIiKLnm0mZRHzHE63vYFWCmqBTpefFrvd1UaxzmoBtgsKdHF2S/trBbAX50kS8kdRUmtgKyiUVRZmGtaCcQ5KS9+G2rdc/2aFGNgsSJSb4ppJkRYKODTlrBAkDn3wZk5LY/Kx2z6yie/ejs6tpuWpv5RBrAlaCntzPbeM0zI0JEobnKbaCREkReXJe41viRKeNqRHSfas+A6s5iCMsBAnqjzkOLzaCOMNCUETTgGN62Aiqis7VDRaCltJyMzdYCOIMBCmAIAUQpACCFECQAghSAEEKIIi7oGVNVbSuarxxQdyBIAUQpACCFEAQ96XnK/cxyJeD5aXhsvt1gwQBqsQvQezlS8vQLKsAAAAASUVORK5CYII=", "lord8": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABCCAYAAAD0dpAhAAABmUlEQVR4nO3YoU7DQBzH8f8WFAazByDBzDBRNcEECGYqeIQJEpJaFAaBQc2OkCD2CIiaTWxiiKmJYjAkPABvgIAglpSw7r+7a6/3v/t91Ebosn7537WUCAAAAAAAAADAKw0SJFvMvtevO70zK9+9SQLjbHofdKCsIIaNSM4usUzh5KtcbnskzO3N8M/7u/vrMCdIZYqqnCARe1CdnA7UsXQpFxvIhYi1/4VM9iMbE+ZsoOjwdOfL/Opjjk26LiIDjR6rvfcRHyi5GlqLJDKQzUhiA+1iPJ5cUsiBEgtTJDrQOtJykm68JRgM+k+mUyQ+0K9uP24URTLlRaBtkUynqCn9Ljr/+0WRWq39iHwKVKY0XYziuJfoHu9doG7J+5G4R64qkT6/Dh5MpsfLCcpHIl8fd0SKm3T+kcf5yUXhsdOXZ+Xz9XKJvb2//vtZ++hY67O8XWJlQSAGAjEQiIFADAQK8TLf1rykBxFoqnEzuA2WGAOBGAgkLVCk8Y+qyXHiArkGgRgIxEAgBgIxEIiBQAwEYiAQAFCNfgDtPnCFOyw5xgAAAABJRU5ErkJggg==", "lord9": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABCCAYAAAD0dpAhAAACXklEQVR4nO2bIVTCQBiAD57mGSBYKBowWKQYVlyQAEEDBotWrVosBItFs8UgRiwECRCkECxQDBr0PR+FMMKWDfo23d7Yxv5t3ry78X9lcLvd7b79/z/YeyMEQRAEQRBkPsmE7Shv73zRnrzfbYWenxULUTqPRx9UJh0M7trV3XqFCECW9QnwDgoCQEEAKAgABQGgIAAUBICCAFAQAAoCQEEAKAgABQGgIAAUBICCaD4w4wF18OB5spkvVRN7MpkVXU5Q+1wJUgEJSUkSQpAacvFJSOJekBpx0bQlcS+INSgIAAUBoCDRfyjmS9WMVXgXC8WZ/T5Hr3b/uRKkqW+h7kqWPKP/Un41k3pBWkgxQcfSEJVNmxza42TTKofWeFylmOZYzLh/+OfxluVbe9y46cZdBPEGNxGkuVLBuvo0x48TRcJGkK6P5iuC4ghxt0lSgaRG0GTYI8WcNJVW/fs9+/P69mXkMSFh1nyvEz0jRARtLOd85Rg8d09J92Zifj5phq9HV3veu99555EcK2VzvuH4Z8xUpdjV76KDRLnFGFJowFTQ0HE194nk2W8tsl5WPBIMWbOixc3mWin2OXITQaf1d3J5vmJ/l2tN30X7yQqKlr/IYS5oy1GDDNrXOqkcSeZWrvkf44wqKI3OlLJnjl5aatCZUja3F48d3/1BcqxjacBUUM/nalaINNXuTJGnl0FiqSRcBP2nBG4F7bjqA9ROg1bEGsTdf7H+tU54gmkEtSJeTRZwF0G8wTSCDhKsNbNoiF6DeINpBDUEqEHMBOU2toR4qRffekYQhDDkG7jI20eRekZWAAAAAElFTkSuQmCC", "player": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAgCAYAAAASYli2AAAA8UlEQVR4nGNgoDXYubTnPwhTWy0DIYW45JkY6Al24nAF0d7EpfnruztwTMgwRnySIANwyXELqTDSJQyZiHEdl6DyXXzyJLlQT8+L4dv7u8rIfLLC8Cue8MMXjkykKCZGngWbYHGADUHXwdT0bjjCSNBAEIi6+5Hhhn0gTgOjGBgYlinz0z7ZsJCi+OTHj2gi/MQbCPJO07wFKGIaSOyFBk4MA5tT0IGtVRgK/66RHANRBhZjSTIww9ANxaaeiYEIcPjYKhSaKl4+TIRhAxspVDewLimBKHWM+CSRizBQ6YLOp8iFxAKmQW8gXkCTin7AAQBQl2xeVo57eQAAAABJRU5ErkJggg==", "grandma": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAgCAYAAAASYli2AAABFUlEQVR4nGNgGExg1etnJ0CYaobVxjv+h7EpNgxEwwxEFmNiwAKWzl4PV4hPTrdn6Ulc6ogyFCaGz4UspBoKAmGiUhYgAy6XRMMNA4kRNBAfgBm6qocBbhjFYXi5JNoc2TCcBsJAb28HGKOz8QEWZJujUwMZkSWLiyuwsvEBJgYqAyYYA+Q6WPiguxQZ4JMDARRJkIGXL9/YykAE6JhU6QNKh80L96OYgZJsQIbp6mp44zOIkIVMDFQGTKS6gBBgIaTgeajuXcnVl5VhfEJBwkLIQGTDkH0AzzEL91MnDEHJ58aRSRjicAMr8tq3kGIgLvVMDFQGTKMGUgwYSS2xkUsbbIUDEwOVAdOgN5AFmyChUpmuAAAFXZKzcRWCtAAAAABJRU5ErkJggg==", "starved": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAAyklEQVR4nGNgGEygqaH9/6CwrIkIh7BQw/K6hkpGQmoZyTEYBoixgGSL8AVPHREWMjHQCTCR65vMNNa7+OTJsggbmD7rtzIp6jFSnbeb3x0GGgAmYhSdPHYcHkyDPjGw4As2cytLkuJh6CRvZDB92lQGcgBOi7AFGzZL6ogshsgqVEEWZmZl48ys2CwnySKQ4ciWkOIjJlIzKrIlQyfVmROZf+pIqI/gcbR11yYVJIuo3kZgYhgMoAlL0qV6i6iJwlbP0CnrGAY7AAB6W0uYsFjrnQAAAABJRU5ErkJggg==", "keeper": "data:image/png;base64,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", "core": "data:image/png;base64,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"};
+const LAYERS = [
+  { id: 'sky', sky: true },
+  { n: 1, place: '할머니의 마을', who: '규칙을 쓰는 사람', kind: '거미 의장', c: 'var(--up)', planned: true,
+    holds: '규칙', mirror: '사람보다 앞선 규칙',
+    rumor: '하늘이 꺼진 뒤 마을을 지킨 의장.',
+    truth: '하늘이 꺼지자 ‘빛은 의회가 지킨다’는 규칙을 거미줄로 짰다. 할머니만 그 규칙을 어기고 병을 아이에게 주었다. 젊을 때 같이 안개를 모으던 동무였다.',
+    meet: '돌아오는 길, 병의 빛을 나눠 주면 거미줄이 풀린다.', img: 'grandma', imgNote: '할머니 (이 겹에 산다)' },
+  { n: 2, place: '반짝이 가게', who: '빛을 파는 사람', kind: '땅아귀', c: 'var(--up)', planned: true,
+    holds: '값', mirror: '무엇이든 사고파는 것',
+    rumor: '어둠 속에서도 빛을 구해 주는 친절한 상인.',
+    truth: '이마의 가짜 빛으로 손님을 꾄다. 병에 담아 파는 빛은 밖에서만 밝고 안은 깜깜하다. 어린 까치가 처음 산 빛도 여기서 산 것이었다.' },
+  { n: 3, place: '줄 서는 마당', who: '줄을 세우는 사람', kind: '개미 반장', c: 'var(--up)', planned: true,
+    holds: '순서', mirror: '줄 세우기와 점수',
+    rumor: '빛을 공평하게 나누는 성실한 반장.',
+    truth: '빛을 나눌 때 줄 맨 뒤에 섰던 부나들은 빛을 받지 못하고 빛굶주린 자가 되었다. 맨 앞자리는 비어 있는데, 무엇을 기다리는지 아무도 모른다.', img: 'starved', imgNote: '빛굶주린 자 (줄 맨 뒤에 섰던 부나)' },
+  { n: 4, place: '소문의 길', who: '소문을 옮기는 사람', kind: '메아리앵무', c: 'var(--up)', planned: true,
+    holds: '이야기', mirror: '확인하지 않고 퍼뜨리는 말',
+    rumor: '아래의 일을 알려 주는 고마운 전령.',
+    truth: '아래 다섯 어른의 소문을 처음 옮긴 입. 게임 속 ‘어른들이 하는 말’은 모두 이 앵무의 목소리다. 들은 말을 그대로, 조금 더 크게.' },
+  { band: true },
+  { n: 5, place: '내일의 숲', who: '내일을 지키는 사람', kind: '서랍달팽이', c: 'var(--f5)', light: '초록빛', img: 'lord5',
+    holds: '내일', mirror: '오늘을 미루는 일',
+    rumor: '숲의 씨앗을 모두 훔쳐 서랍에 가둔 도둑. 그래서 숲이 자라지 않는다.',
+    truth: '가장 좋은 날에 심으려고 아껴 두었다. 오늘은 늘 조금 추웠다. 서랍이 천 개가 되었고 숲은 아직 새싹이다. 피어난 것은 언젠가 진다는 걸 알았기에.',
+    creed: '“아직 아니다. 오늘은 바람이 차다. 내일 심자.”',
+    last: '“맨 아래 서랍을 열어 봐라. ‘오늘’이라고 적힌 씨앗이 하나 있다. 그건… 네가 심어 다오.”',
+    tie: '버섯갓 원예사의 스승. 쓰러뜨리면 원예사가 ‘오늘’ 씨앗을 캠프 온실에 심는다.', camp: true },
+  { n: 6, place: '쉬지 않는 굴', who: '쉬지 않는 사람', kind: '여섯팔두더지', c: 'var(--f6)', light: '붉은빛', img: 'lord6',
+    holds: '할 일', mirror: '왜 하는지 잊은 바쁨',
+    rumor: '광맥을 혼자 차지하려고 밤낮없이 파는 욕심쟁이.',
+    truth: '누군가에게 줄 선물을 깎으려고 파기 시작했다. 조금만 더, 조금만 더. 이제 벽에는 할 일이 서른아홉 줄 있고, 그 선물이 누구 것이었는지 잊었다.',
+    creed: '“바쁘다. 비켜라. 할 일이 서른아홉 개다.”',
+    last: '“동쪽 벽에 깎다 만 새가 있다. 날개만 달아 주면 된다. 누구에게 주려 했는지는… 네가 알아내 다오.”',
+    tie: '잊은 이름은 불도롱뇽 대장장이. 어릴 적 동무였다.' },
+  { n: 7, place: '물벽의 집', who: '벽을 세운 사람', kind: '물집게', c: 'var(--f7)', light: '푸른빛', img: 'lord7',
+    holds: '벽', mirror: '다칠까 봐 닫은 마음',
+    rumor: '물을 세워 아무도 못 지나가게 한 심술쟁이.',
+    truth: '다친 것들을 데려와 재우던 사람. 한 번 물린 뒤로 물을 세웠다. 나은 것들은 하나씩 벽을 넘어 떠났고 그녀만 남았다. 찻잔은 아직도 두 개 꺼낸다.',
+    creed: '“가까이 오지 마라. 좋은 것도 물 수 있다는 걸 알 뿐이다.”',
+    last: '“침상 열두 개를 다 치우지는 마라. 하나는 남겨 둬.”',
+    tie: '늪개구리 우물지기가 그녀를 문 아이였다. 두 번째 찻잔의 주인.' },
+  { n: 8, place: '눈 감은 어둠', who: '눈을 감은 사람', kind: '큰눈원숭이', c: 'var(--f8)', light: '보랏빛', img: 'lord8',
+    holds: '어둠', mirror: '보기 싫은 것을 외면하기',
+    rumor: '빛을 미워해 횃불을 죽이는 저주꾼.',
+    truth: '밝은 등불 시장에서 보기 싫은 것까지 다 보였다. 불을 하나씩 끄고 마지막엔 눈을 감았다. 어둠 속에서 처음으로 들었다. 우는 소리는 여전히 거기 있었다.',
+    creed: '“보이지 않으면 없는 거다. 너도 병을 가려 봐라.”',
+    last: '“노랫소리가 들리면 따라가라. 내가 외면한 아이들이다.”',
+    tie: '노래하는 작은 부나들 — 그가 외면했던 시장 구석의 아이들.' },
+  { n: 9, place: '하늘 창고', who: '하늘을 가진 사람', kind: '까치', c: 'var(--f9)', light: '흰빛', img: 'lord9',
+    holds: '하늘', mirror: '가져야만 내 것이라는 믿음',
+    rumor: '하늘을 훔쳐 창고에 가둔 도둑. 하늘이 꺼진 건 그 때문이다.',
+    truth: '“가진 것만 네 것이다”를 배우고 자랐다. 아무것도 없어서 가장 큰 것을 가졌다. 장부에 ‘하늘 — 내 것’이라 적고 빛기둥을 깼다. 그런데 창고 안은 깜깜했다.',
+    creed: '“나는 하늘을 샀다. 장부에 적혀 있다. 너는 무엇을 가졌지?”',
+    last: '“그 하늘을 누구와 같이 봤는지, 그것만 장부에 적어라.”',
+    tie: '어린 시절 땅아귀에게 산 병 속 빛이 깜깜했다. 그날 진짜 빛을 갖기로 했다.' },
+  { id: 'heart', heart: true },
+];
+const SPECIAL = {
+  sky: { who: '빛안개 (하늘)', kind: '나엘의 하늘', c: 'var(--teal)', img: 'player', imgNote: '주인공 — 작은 부나',
+    rows: [['무엇', '심장의 빛이 빛기둥을 타고 올라와 대기에 번진 청록·보랏빛 커튼. 심장이 크게 뛰면 낮, 잦아들면 밤.'],
+           ['주인공', '나방을 닮은 종족 ‘부나’의 아이. 어른 부나는 가슴의 빛주머니에 빛을 품지만, 아이는 아직 비어 있어 병을 든다.'],
+           ['할머니', '마을의 마지막 안개지기. 빨려 들어가기 전 하늘의 마지막 한 줌을 병에 담아 건넨다.']] },
+  heart: { who: '심장', kind: '웅크려 잠든 작은 별', c: 'var(--f9)', img: 'core', imgNote: '깨어난 심장',
+    rows: [['무엇', '나엘이 별을 떠날 때 품고 나온 별빛 한 덩이. 모든 빛의 근원.'],
+           ['응답', '병의 빛이 흰빛(붉은·초록·푸른 셋 다)이고, 캠프 제단 셋이 모두 밝혀졌을 때.'],
+           ['선택', '하늘을 모두에게 돌려줄까, 내가 가질까.']] },
+};
+
+const planet = document.getElementById('planet'), card = document.getElementById('card');
+const pillar = document.createElement('div'); pillar.className = 'pillar'; planet.appendChild(pillar);
+LAYERS.forEach((L, i) => {
+  let el;
+  if (L.sky) { el = document.createElement('div'); el.className = 'sky'; el.innerHTML = '<b>하늘 · 빛안개</b><br><span style="color:var(--dim);font-size:13px">지상 · 안개마을 · 이야기의 시작</span>'; el.style.cursor = 'pointer'; el.onclick = () => show('sky', el); }
+  else if (L.heart) { el = document.createElement('div'); el.className = 'heart'; el.innerHTML = `<img class="px" src="${IMG.core}" height="48"><br><b>심장</b>`; el.onclick = () => show('heart', el); }
+  else if (L.band) { el = document.createElement('div'); el.className = 'band'; el.textContent = '— 무너진 암석층 · 내려가면 뒤가 닫힌다 —'; }
+  else {
+    el = document.createElement('div'); el.className = 'layer'; el.style.setProperty('--c', L.c);
+    el.innerHTML = `<div class="n">${L.n}층</div><div class="t"><b>${L.place}</b><span>${L.who} · ${L.kind}${L.planned ? ' · 돌아오는 길' : ''}</span></div>` +
+      (L.img && !L.planned ? `<img class="px" src="${IMG[L.img]}">` : '');
+    el.onclick = () => show(i, el);
+  }
+  planet.appendChild(el);
+});
+
+function show(key, el) {
+  document.querySelectorAll('.layer.on').forEach(x => x.classList.remove('on'));
+  if (el.classList.contains('layer')) el.classList.add('on');
+  const S = SPECIAL[key];
+  if (S) {
+    card.style.setProperty('--c', S.c);
+    card.innerHTML = `<div class="head"><img class="px" src="${IMG[S.img]}"><div><h3>${S.who}</h3><div class="kind">${S.kind}</div><div class="kind">${S.imgNote}</div></div></div>` +
+      `<dl>${S.rows.map(r => `<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}</dl>`;
+    return;
+  }
+  const L = LAYERS[key];
+  card.style.setProperty('--c', L.c);
+  const img = L.img ? `<img class="px" src="${IMG[L.img]}">` : '';
+  const rows = [
+    ['쥐고 있는 것', `<b>${L.holds}</b> — ${L.mirror}`],
+    L.light ? ['이 겹의 빛', L.light] : null,
+    ['소문', `<span class="rumor">${L.rumor}</span>`],
+    ['진실', L.truth],
+    L.creed ? ['마주칠 때', `<span class="quote">${L.creed}</span>`] : null,
+    L.last ? ['쓰러질 때', `<span class="quote">${L.last}</span>`] : null,
+    L.tie ? ['끊어진 끈', L.tie] : null,
+    L.meet ? ['만나는 법', L.meet] : null,
+  ].filter(Boolean);
+  card.innerHTML = `<div class="head">${img}<div><h3>${L.n}층 · ${L.who}</h3><div class="kind">${L.kind} · ${L.place}</div>` +
+    `<div style="margin-top:6px">${L.planned ? '<span class="badge">예정 — 돌아오는 길</span>' : '<span class="badge in">게임에 있음 — 층의 주인</span>'}</div>` +
+    (L.imgNote ? `<div class="kind" style="margin-top:6px">그림: ${L.imgNote}</div>` : '') + `</div></div>` +
+    `<dl>${rows.map(r => `<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}</dl>`;
+}
+show('sky', planet.querySelector('.sky'));
+
+// ---- relationship map
+const N = {
+  child: [470, 60, '아이 (작은 부나)', 'var(--teal)'], grandma: [230, 60, '할머니 · 안개지기', 'var(--teal)'],
+  spider: [60, 170, '거미 의장 · 1층', 'var(--up)'], parrot: [700, 170, '메아리앵무 · 4층', 'var(--up)'],
+  angler: [60, 300, '땅아귀 · 2층', 'var(--up)'], ant: [60, 430, '개미 반장 · 3층', 'var(--up)'],
+  snail: [470, 250, '서랍달팽이 · 5층', 'var(--f5)'], mole: [470, 320, '여섯팔두더지 · 6층', 'var(--f6)'],
+  crab: [470, 390, '물집게 · 7층', 'var(--f7)'], tarsier: [470, 460, '큰눈원숭이 · 8층', 'var(--f8)'], magpie: [300, 300, '까치 · 9층', 'var(--f9)'],
+  gardener: [800, 250, '버섯갓 원예사', 'var(--f5)'], smith: [800, 320, '불도롱뇽 대장장이', 'var(--f6)'],
+  frog: [800, 390, '늪개구리 우물지기', 'var(--f7)'], kids: [800, 460, '노래하는 작은 부나들', 'var(--f8)'], starved: [290, 430, '빛굶주린 자', 'var(--up)'],
+};
+const E = [
+  ['grandma', 'child', '손주 · 병을 건넴'], ['grandma', 'spider', '옛 동무 · 규칙을 어김'],
+  ['parrot', 'snail', '소문을 지어냄'], ['angler', 'magpie', '가짜 빛을 팖'], ['ant', 'starved', '줄 맨 뒤'],
+  ['snail', 'gardener', '스승과 제자'], ['mole', 'smith', '잊은 이름 · 돌 새'], ['crab', 'frog', '그녀를 문 아이 · 두 번째 찻잔'],
+  ['tarsier', 'kids', '외면한 아이들'], ['child', 'snail', '병을 들고 아래로'],
+];
+const W = 960, H = 540, bw = 150, bh = 34;
+let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5b6a88"/></marker></defs>`;
+for (const [a, b, label] of E) {
+  const [x1, y1] = N[a], [x2, y2] = N[b];
+  const sx = x1 + bw / 2, sy = y1 + bh / 2, ex = x2 + bw / 2, ey = y2 + bh / 2;
+  const dx = ex - sx, dy = ey - sy, len = Math.hypot(dx, dy);
+  const ox = dx / len * 80, oy = dy / len * 20;
+  svg += `<line x1="${sx + ox}" y1="${sy + oy}" x2="${ex - ox}" y2="${ey - oy}" stroke="#3a4866" stroke-width="1.5" marker-end="url(#a)"/>`;
+  svg += `<text class="lbl" x="${(sx + ex) / 2}" y="${(sy + ey) / 2 - 6}" text-anchor="middle">${label}</text>`;
+}
+for (const [k, [x, y, name, c]] of Object.entries(N)) {
+  svg += `<g class="node"><rect x="${x}" y="${y}" width="${bw}" height="${bh}" fill="#10162a" stroke="${getComputedStyle(document.documentElement).getPropertyValue(c.slice(4, -1)) || c}"/>` +
+         `<text x="${x + bw / 2}" y="${y + 22}" text-anchor="middle">${name}</text></g>`;
+}
+svg += `<text class="lbl" x="135" y="${H - 8}" text-anchor="middle">위의 어른들 (돌아오는 길)</text><text class="lbl" x="545" y="${H - 8}" text-anchor="middle">아래의 어른들 (층의 주인)</text><text class="lbl" x="875" y="${H - 8}" text-anchor="middle">캠프와 그 밖의 사람들</text>`;
+document.getElementById('rel').innerHTML = svg + '</svg>';
+</script>
+</body>
+</html>
