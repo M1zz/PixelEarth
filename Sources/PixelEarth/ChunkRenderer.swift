@@ -77,7 +77,7 @@ final class ChunkRenderer {
                 let def = TILES[t]
                 let dest = CGRect(x: CGFloat(tx * 16), y: destY, width: 16, height: 16)
                 // background wall below the surface line
-                if (!def.solid || t == Tile.glass) && wy > world.surface[wx] {
+                if (!def.solid || t == Tile.glass) && wy > world.surface[wx] && !world.openToStageSky(wx, wy) {
                     let kind = wy < world.surface[wx] + 5 ? (world.biome[wx] == 2 ? 2 : 0) : 1
                     if let img = assets.wall(kind: kind, variant: (wx * 7 + wy * 13) & 3) { ctx.draw(img, in: dest) }
                 }

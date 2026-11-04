@@ -23,7 +23,12 @@ final class GameScene: SKScene {
     /// Skymist: the sky is drawn by a shader (gradient + moving aurora curtains), quantized to chunky pixels.
     let skyUniforms = (day: SKUniform(name: "u_day", float: 1), dusk: SKUniform(name: "u_dusk", float: 0),
                        under: SKUniform(name: "u_under", float: 0), cam: SKUniform(name: "u_cam", float: 0),
-                       res: SKUniform(name: "u_res", vectorFloat2: vector_float2(800, 600)))
+                       res: SKUniform(name: "u_res", vectorFloat2: vector_float2(800, 600)),
+                       stage: SKUniform(name: "u_stage", float: 0), stop: SKUniform(name: "u_stop", vectorFloat4: vector_float4(0, 0, 0, 0)),
+                       sbot: SKUniform(name: "u_sbot", vectorFloat4: vector_float4(0, 0, 0, 0)), saur: SKUniform(name: "u_saur", vectorFloat4: vector_float4(0, 0, 0, 0)))
+    /// The stage sky shown now, eased toward the floor the player is on so arriving reads as a new sky opening.
+    var stageSky: (top: SIMD3<Float>, bot: SIMD3<Float>, aur: SIMD4<Float>, blend: Float, stars: Float) = (.zero, .zero, .zero, 0, 0)
+    var lastStageShown: Int? = nil
     /// Light rises from below on Nael: slow motes drift upward around the player, tinted by the floor's light.
     let motes = SKEmitterNode()
 
@@ -67,8 +72,68 @@ final class GameScene: SKScene {
     var lightDirty = true
     var snowTimer = 0.0
     var snapCamera = false
+    /// The disaster's glimpse: the camera sinks to the sky locked in the ninth floor and comes back (seconds into it, 0 = off).
+    var glimpseT = 0.0
+    static let glimpseLength = 4.2
     /// Paintings in the side passages: names, scratches, cots, the painted sky. Drawn over tiles, under the lighting.
     let decorNode = SKNode()
+    /// What the jar's lens shows through the rock; drawn above the darkness.
+    let lensNode = SKNode()
+    var lensT = 0.0
+
+    func syncLens(_ dt: Double) {
+        lensT -= dt
+        guard lensT <= 0 else { return }
+        lensT = 0.25
+        lensNode.removeAllChildren()
+        guard game.loaded, !paused_ else { return }
+        let (marks, way) = game.lensMarks()
+        let pulse = SKAction.repeatForever(.sequence([.fadeAlpha(to: 0.45, duration: 0.6), .fadeAlpha(to: 0.95, duration: 0.6)]))
+        func color(_ t: Int) -> SKColor {
+            switch t {
+            case Tile.coal: return SKColor(white: 0.75, alpha: 1)
+            case Tile.iron: return SKColor(red: 0.95, green: 0.72, blue: 0.6, alpha: 1)
+            case Tile.gold: return SKColor(red: 1, green: 0.85, blue: 0.3, alpha: 1)
+            case Tile.diamondOre: return SKColor(red: 0.5, green: 0.95, blue: 1, alpha: 1)
+            case Tile.hiddenVein: return SKColor(red: 1, green: 0.35, blue: 0.3, alpha: 1)
+            case Tile.chest, Tile.throne: return SKColor(red: 1, green: 0.8, blue: 0.35, alpha: 1)
+            case Tile.ghostStone: return SKColor(red: 0.75, green: 0.55, blue: 1, alpha: 1)
+            case Tile.tideWall: return SKColor(red: 0.45, green: 0.75, blue: 1, alpha: 1)
+            case Tile.crack: return SKColor(red: 0.55, green: 1, blue: 0.6, alpha: 1)
+            case Tile.junction: return SKColor(red: 0.5, green: 0.85, blue: 1, alpha: 1)
+            default: return SKColor(red: 0.95, green: 1, blue: 0.85, alpha: 1)
+            }
+        }
+        for m in marks {
+            let c = color(m.kind)
+            let p = scenePos(Double(m.x) + 0.5, Double(m.y) + 0.5)
+            if game.lens == .ore {
+                let g = SKSpriteNode(texture: assets.glow); g.size = CGSize(width: 14, height: 14); g.color = c; g.colorBlendFactor = 1; g.blendMode = .add; g.position = p
+                let gem = SKSpriteNode(color: c, size: CGSize(width: 4, height: 4)); gem.zRotation = .pi / 4; g.addChild(gem)
+                g.run(pulse); lensNode.addChild(g)
+            } else {
+                let f = SKSpriteNode(texture: assets.cursor); f.size = CGSize(width: 16, height: 16); f.color = c; f.colorBlendFactor = 1; f.position = p
+                f.run(pulse); lensNode.addChild(f)
+            }
+        }
+        if let w = way, let tex = HUD.symbolTexture("arrowtriangle.right.fill") {
+            // an arrow beside the player, turned toward the nearest vein down
+            let a = atan2(-(Double(w.y) - game.player.y), Double(w.x) + 0.5 - game.player.x)
+            let n = SKSpriteNode(texture: tex); n.size = CGSize(width: 12, height: 12); n.color = color(Tile.crack); n.colorBlendFactor = 1
+            n.position = scenePos(game.player.x + cos(a) * 2.2, game.player.y + 0.8 - sin(a) * 2.2); n.zRotation = CGFloat(a)
+            n.run(pulse); lensNode.addChild(n)
+        }
+    }
+
+    /// A title card each time the player arrives on a floor: below its ceiling, or on floor 4 after the descent begins.
+    func updateStageTitle() {
+        guard game.disasterStruck else { lastStageShown = nil; return }
+        let py = Int(floor(game.player.y)), f = Layers.index(forY: py)
+        let inside = f == 4 || (f >= 5 && py >= Stage.ceiling(f))
+        guard inside, f != lastStageShown, let t = Stage.title(f) else { return }
+        lastStageShown = f
+        hud.showStage(number: t.number, name: t.name, line: t.line, tint: Stage.sky(max(5, f)).aurora)
+    }
 
     func buildPassageDecor() {
         decorNode.removeAllChildren()
@@ -103,6 +168,7 @@ final class GameScene: SKScene {
         addChild(worldNode)
         worldNode.addChild(chunkRenderer.node)
         worldNode.addChild(decorNode)
+        lensNode.zPosition = 41
         worldNode.addChild(entityNode)
         worldNode.addChild(fxNode)
         setupBackground()
@@ -125,7 +191,7 @@ final class GameScene: SKScene {
         game.onStoryEvent = { [weak self] ev in
             guard let self = self else { return }
             switch ev {
-            case "disaster": self.shake = 1.6
+            case "disaster": self.shake = 1.6; self.glimpseT = 0.001
             case "tremor": self.shake = 0.5
             case "collapse": self.shake = 1.2
             case "choice": self.hud.showChoice()
@@ -156,7 +222,7 @@ final class GameScene: SKScene {
     func setupBackground() {
         skyNode = SKSpriteNode(color: .black, size: CGSize(width: 10, height: 10)); skyNode.zPosition = -100
         let u = skyUniforms
-        skyNode.shader = SKShader(source: GameScene.skyShader, uniforms: [u.day, u.dusk, u.under, u.cam, u.res])
+        skyNode.shader = SKShader(source: GameScene.skyShader, uniforms: [u.day, u.dusk, u.under, u.cam, u.res, u.stage, u.stop, u.sbot, u.saur])
         cam.addChild(skyNode)
         starsNode = SKSpriteNode(texture: assets.stars); starsNode.zPosition = -99; starsNode.alpha = 0
         cam.addChild(starsNode)
@@ -188,6 +254,9 @@ final class GameScene: SKScene {
         }
         vec3 aur = mix(vec3(0.30, 1.00, 0.78), vec3(0.72, 0.42, 1.00), clamp((px.y - 0.55) * 2.2, 0.0, 1.0));
         col += aur * a * (0.15 + 0.85 * u_day);
+        // a stage's own sky: its gradient and its aurora colour, over the same moving curtains
+        vec3 scol = mix(u_sbot.rgb, u_stop.rgb, px.y) + u_saur.rgb * a * u_saur.a;
+        col = mix(col, scol, u_stage);
         col = floor(col * 20.0) / 20.0;
         col = mix(col, vec3(0.05, 0.05, 0.08), u_under);
         gl_FragColor = vec4(col, 1.0);
@@ -265,6 +334,7 @@ final class GameScene: SKScene {
         lightSprite.anchorPoint = CGPoint(x: 0, y: 0)
         lightSprite.zPosition = 40
         worldNode.addChild(lightSprite)
+        worldNode.addChild(lensNode)
     }
 
     // MARK: game flow
@@ -298,7 +368,7 @@ final class GameScene: SKScene {
     /// Physical key names, so shortcuts keep working with Korean or any other input source selected.
     private static let keyNames: [UInt16: String] = [
         11: "b", 9: "v", 8: "c", 0: "a", 1: "s", 2: "d", 13: "w", 12: "q", 14: "e", 15: "r", 17: "t", 3: "f", 34: "i", 38: "j", 40: "k", 37: "l", 46: "m",
-        18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9",
+        48: "tab", 18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9",
         123: "left", 124: "right", 126: "up", 125: "down", 49: "space", 36: "return", 76: "return",
     ]
 
@@ -321,6 +391,7 @@ final class GameScene: SKScene {
         case "i": hud.togglePanel(.inventory)
         case "j": hud.togglePanel(.jar)
         case "r": hud.togglePanel(.reign)
+        case "tab": game.cycleLens()
         case "c": game.toggleCover()
         case "b": game.buildTurret()
         case "v": game.buildWall()
@@ -393,10 +464,23 @@ final class GameScene: SKScene {
             game.input.mouseX = wm.x; game.input.mouseY = wm.y
             game.input.uiOpen = hud.panelOpen
             game.update(dt)
+            updateStageTitle()
+            syncLens(dt)
             Sound.shared.mood = game.musicMood
         }
         // camera follows the player
-        let target = scenePos(game.player.x + game.player.face * 1.5, game.player.y + game.player.h / 2)
+        var target = scenePos(game.player.x + game.player.face * 1.5, game.player.y + game.player.h / 2)
+        if glimpseT > 0 {
+            glimpseT += dt
+            let core = scenePos(Double(game.world.coreX) + 0.5, Double(game.world.coreY) - 3)
+            let t = glimpseT, L = GameScene.glimpseLength
+            let k = t < 1.3 ? t / 1.3 : (t < L - 1.3 ? 1 : max(0, (L - t) / 1.3))
+            let e = CGFloat(k * k * (3 - 2 * k))
+            target = CGPoint(x: target.x + (core.x - target.x) * e, y: target.y + (core.y - target.y) * e)
+            snapCamera = true
+            if t > 1.3 && t - dt <= 1.3, let tt = Stage.title(9) { hud.showStage(number: tt.number, name: tt.name, line: tt.line, tint: Stage.sky(9).aurora) }
+            if t >= L { glimpseT = 0 }
+        }
         let halfW = size.width / zoom / 2, halfH = size.height / zoom / 2
         game.viewHalfTiles = Int(ceil(halfW / TILE_PX))
         var cx = cam.position.x + (target.x - cam.position.x) * CGFloat(min(1, dt * 6))
@@ -443,10 +527,12 @@ final class GameScene: SKScene {
         for y in cy0...cy1 {
             for x in cx0...cx1 {
                 let i = y * W + x
-                let r = L.r[i], g = L.g[i], b = L.b[i]
+                var r = L.r[i], g = L.g[i], b = L.b[i]
+                if Int(r) + Int(g) + Int(b) > 6 { game.world.explored[i] = 1 }
+                // Only the unexplored stays black: places already seen keep a dim, remembered light.
+                if game.world.explored[i] != 0 { r = max(r, 7); g = max(g, 7); b = max(b, 8) }
                 lightData[k] = r &* 17; lightData[k + 1] = g &* 17; lightData[k + 2] = b &* 17; lightData[k + 3] = 255
                 k += 4
-                if Int(r) + Int(g) + Int(b) > 6 { game.world.explored[i] = 1 }
             }
         }
         let tex = SKTexture(data: Data(lightData), size: CGSize(width: w, height: h), flipped: true)
@@ -496,7 +582,32 @@ final class GameScene: SKScene {
         let depth = CGFloat(game.player.y - Double(game.world.surfaceAt(Int(game.player.x))))
         let under = max(0, min(1, (depth - 6) / 14))
         for n in mountainsA + mountainsB { n.alpha = 1 - under }
-        skyUniforms.under.floatValue = Float(under)
+        // Stages: below a floor's ceiling the sky is that floor's own; the cave darkness fade does not apply.
+        let py = Int(floor(game.player.y)), f = Layers.index(forY: py)
+        let onStage = f >= 5 && game.disasterStruck
+        let target = Stage.sky(max(5, f))
+        let k = Float(min(1, dt * 1.6))
+        stageSky.top += (SIMD3(target.top.0, target.top.1, target.top.2) - stageSky.top) * k
+        stageSky.bot += (SIMD3(target.bottom.0, target.bottom.1, target.bottom.2) - stageSky.bot) * k
+        stageSky.aur += (SIMD4(target.aurora.0, target.aurora.1, target.aurora.2, target.aurora.3) - stageSky.aur) * k
+        stageSky.blend += ((onStage ? 1 : 0) - stageSky.blend) * k
+        stageSky.stars += ((onStage ? target.stars : 0) - stageSky.stars) * k
+        let sb = CGFloat(stageSky.blend)
+        skyUniforms.stage.floatValue = stageSky.blend
+        skyUniforms.stop.vectorFloat4Value = SIMD4(stageSky.top, 1); skyUniforms.sbot.vectorFloat4Value = SIMD4(stageSky.bot, 1)
+        skyUniforms.saur.vectorFloat4Value = stageSky.aur
+        skyUniforms.under.floatValue = Float(under * (1 - sb))
+        starsNode.alpha = starsNode.alpha * (1 - sb) + CGFloat(stageSky.stars) * sb
+        moonNode.alpha *= (1 - sb)
+        if sb > 0.01 {
+            // the far horizon of the floor, sitting on its hall ground, in the floor's colours
+            let ground = scenePos(0, Double(Stage.ceiling(max(5, f)) + Stage.hallDepth(max(5, f)))).y - camY
+            let hz = SKColor(red: CGFloat(stageSky.bot.x) * 0.6, green: CGFloat(stageSky.bot.y) * 0.6, blue: CGFloat(stageSky.bot.z) * 0.6, alpha: 1)
+            for (i, n) in (mountainsA + mountainsB).enumerated() {
+                n.alpha = max(n.alpha, 0.7 * sb); n.color = hz
+                n.position.y = ground - (i < mountainsA.count ? 30 : 60)
+            }
+        }
         motes.position = playerNode.position
         motes.particleColor = moteColor
     }

@@ -9,6 +9,8 @@ struct Jar: Codable {
     var gel = 0                    // small creatures (0...6)
     var moss: Double = 0           // grows while water > 3
     var named: String = "병"
+    /// Light left in the jar; nil in older saves means full (see Energy.swift).
+    var energyStore: Double? = nil
 
     /// Light the jar emits, per channel 0...15.
     var light: RGB {

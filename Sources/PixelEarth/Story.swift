@@ -74,6 +74,7 @@ extension Game {
         guard var s = player.inv[i] else { tip("손에 든 것이 없습니다"); return }
         if let why = jar.acceptReason(s.id) { tip(why); return }
         let what = jar.feed(s.id)
+        gainEnergy(energyFor(s.id))
         s.n -= 1; player.inv[i] = s.n <= 0 ? nil : s
         onInventoryChanged?(); sfx(.heal)
         message("\(itemName(s.id)) → \(jar.named): \(what) (\(jar.colorName))")

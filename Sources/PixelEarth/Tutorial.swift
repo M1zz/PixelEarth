@@ -2,8 +2,11 @@ import Foundation
 
 /// The first afternoon: guided steps, then free time on the surface, then the disaster. Rule-level, no SpriteKit.
 enum Tutorial {
-    /// The first five minutes are about the jar, not crafting: look, move, follow a light, feed it, hide it.
-    static let look = 0, walk = 1, jump = 2, follow = 3, feed = 4, cover = 5, done = 6
+    /// Grandmother's errand (Errand.swift): look into the jar, light three neighbours' lamps, and on the way
+    /// find her buried box with the lens, feed the jar, and hide it from a light-starved.
+    static let look = 0, houseA = 1, box = 2, feed = 3, houseB = 4, cover = 5, houseC = 6, done = 7
+    /// After the last house: the child is missing and the ground starts to shake almost at once.
+    static let afterErrand = 14.0
     /// How long the surface stays peaceful after the last step.
     static let freeTime = 180.0
     /// Skipping keeps a short calm so the disaster does not land on the first frame.
@@ -33,15 +36,18 @@ extension Game {
         if tutorialStep >= Tutorial.done { return updateFreeTime(dt) }
         if tutorialStep == Tutorial.look { tutorialLastX = player.x }
         tutorialWalked += abs(player.x - tutorialLastX); tutorialLastX = player.x
+        foreshadow(dt)
+        func lit(_ i: Int) -> Bool { let l = world.houseLamp(i); return world.get(l.x, l.y) == Tile.lantern }
         switch tutorialStep {
         case Tutorial.look: if jarLooked { advanceTutorial() }
-        case Tutorial.walk: if tutorialWalked >= 6 { advanceTutorial() }
-        case Tutorial.jump: if !player.ground && player.vy < 0 { advanceTutorial() }
-        case Tutorial.follow:
-            if countItem(Tile.greenSpore) > 0 || jar.sporeG { advanceTutorial() } else { keepTutorialSpore() }
-        case Tutorial.feed: if jar.sporeG { advanceTutorial() }
+        case Tutorial.houseA: if lit(0) { advanceTutorial() }
+        case Tutorial.box: if world.get(world.boxSpot.x, world.boxSpot.y) != Tile.chest { advanceTutorial() }
+        case Tutorial.feed: if jar.sporeG { advanceTutorial() } else if countItem(Tile.greenSpore) == 0 { keepTutorialSpore() }
+        case Tutorial.houseB: if lit(1) { advanceTutorial() }
         case Tutorial.cover:
+            keepTutorialStarved()
             if jarCovered { tutorialCovered = true } else if tutorialCovered { advanceTutorial() }
+        case Tutorial.houseC: if lit(2) { advanceTutorial() }
         default: break
         }
         return false
@@ -50,10 +56,25 @@ extension Game {
     private func advanceTutorial() {
         tutorialStep += 1; sfx(.pick)
         if tutorialStep >= Tutorial.done {
-            tutorialCalm = Tutorial.freeTime
-            message(L("tutorial.finished"))
-            hideFreeChest()
+            tutorialCalm = Tutorial.afterErrand
+            message(L("errand.childMissing"))
         }
+    }
+
+    /// The sky has been catching its breath for days: a flicker every half minute, and grandmother says so once.
+    private func foreshadow(_ dt: Double) {
+        flickerT -= dt
+        guard flickerT <= 0 else { return }
+        flickerT = Double.random(in: 25...40)
+        skyFactor = 0.62; onStoryEvent?("flicker")
+        if !shownFlicker { shownFlicker = true; message(L("intro.flicker")) }
+    }
+
+    /// A light-starved wandering near the last house, for the hiding step.
+    private func keepTutorialStarved() {
+        if enemies.contains(where: { $0.type == .zombie && abs($0.x - player.x) < 30 }) { return }
+        let l = world.houseLamp(2), x = l.x - 8
+        enemies.append(Enemy(type: .zombie, x: Double(x) + 0.5, y: Double(world.surfaceAt(x) - 2)))
     }
 
     /// A green spore glowing a short walk away: the first thing the jar's light leads to.
@@ -105,8 +126,10 @@ extension Game {
             return (L("objective.free"), L("objective.free.detail"))
         }
         var detail = L("step.\(tutorialStep).detail")
-        if tutorialStep == Tutorial.follow, let t = tutorialSpore {
-            let d = t.x - Int(player.x)
+        let target: Int? = [Tutorial.houseA: world.houseLamp(0).x, Tutorial.box: world.boxSpot.x, Tutorial.houseB: world.houseLamp(1).x,
+                            Tutorial.cover: world.houseLamp(2).x, Tutorial.houseC: world.houseLamp(2).x][tutorialStep]
+        if let tx = target {
+            let d = tx - Int(player.x)
             if abs(d) > 2 { detail += " · " + String(format: L(d > 0 ? "objective.follow.right" : "objective.follow.left"), abs(d)) }
         }
         return (String(format: L("objective.step"), tutorialStep + 1, Tutorial.done, L("step.\(tutorialStep).title")), detail)

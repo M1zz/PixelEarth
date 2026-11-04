@@ -9,7 +9,7 @@ import os, sys
 from PIL import Image, ImageDraw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, '../Sources/PixelEarth/Resources')
+OUT = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else os.path.join(HERE, '../Sources/PixelEarth/Resources')
 CLEAR = (0, 0, 0, 0)
 INK = (18, 16, 24, 255)
 
@@ -116,6 +116,56 @@ def vessel():
     d.line([(5, 2), (18, 2)], fill=(236, 244, 250, 200))      # glass highlight
     return im
 
+# ------------------------------------------------------------------ stage tiles (rows 47-49: stratum, crack, hard rock)
+def stage_rows(tiles):
+    """Built from the atlas's own bedrock and stone rows, so they keep the autotile edges and the ground palette."""
+    if tiles.height < 55 * 16:
+        grown = Image.new('RGBA', (tiles.width, 55 * 16), CLEAR); grown.paste(tiles, (0, 0)); tiles = grown
+    bed = tiles.crop((0, 12 * 16, tiles.width, 13 * 16)); stone = tiles.crop((0, 3 * 16, tiles.width, 4 * 16))
+    def tint(row, k, lines=None):
+        out = row.copy(); px = out.load()
+        for y in range(out.height):
+            for x in range(out.width):
+                r, g, b, a = px[x, y]
+                if not a: continue
+                r, g, b = int(r * k[0]), int(g * k[1]), int(b * k[2])
+                if lines and y % 4 == 1: r, g, b = r + lines, g + lines, b + lines
+                px[x, y] = (min(255, r), min(255, g), min(255, b), a)
+        return out
+    stratum = tint(bed, (0.8, 0.7, 1.05), lines=18)          # layered, violet-dark: the floor's sealed roof
+    hard = tint(stone, (0.55, 0.58, 0.72))                   # dull and dense: hard rock
+    crack = stone.copy(); d = ImageDraw.Draw(crack); px = crack.load()
+    for c in range(crack.width // 16):                       # a bright zigzag split through every cell
+        ox = c * 16
+        pts = [(ox + 8, 0), (ox + 6, 4), (ox + 9, 8), (ox + 7, 12), (ox + 8, 15)]
+        if px[ox + 8, 8][3]:
+            d.line(pts, fill=(28, 22, 36, 255), width=2); d.line(pts, fill=(206, 196, 236, 255), width=1)
+    for i, row in enumerate((stratum, crack, hard)): tiles.paste(row, (0, (47 + i) * 16))
+    # row 50: the light spring, a small glowing pool with a crystal tuft, 2 frames
+    for f in range(2):
+        sp = Image.new('RGBA', (16, 16), CLEAR); d2 = ImageDraw.Draw(sp)
+        d2.ellipse([1, 10, 14, 15], fill=(120, 200, 170, 255), outline=(30, 60, 60, 255))
+        d2.ellipse([3, 11, 12, 14], fill=(220, 250, 210, 255))
+        for x0, h0 in ((5, 7), (8, 9), (11, 6)):
+            d2.polygon([(x0 - 1, 11), (x0, 11 - h0 - f), (x0 + 1, 11)], fill=(240, 255, 230, 255), outline=(60, 110, 100, 255))
+        for p in ((2, 3 + f * 2), (13, 4 - f), (7, 1 + f)): sp.putpixel(p, (255, 255, 220, 255))
+        tiles.paste(sp, (f * 16, 50 * 16))
+    # row 51: walk-through tree trunk, the wood row as it is
+    tiles.paste(tiles.crop((0, 4 * 16, tiles.width, 5 * 16)), (0, 51 * 16))
+    # row 52: an empty lamp, the lantern drawn cold and grey
+    lamp = tiles.crop((0, 29 * 16, 16, 30 * 16)).convert('LA').convert('RGBA')
+    lamp = Image.eval(lamp.convert('RGB'), lambda v: int(v * 0.6)).convert('RGBA'); lamp.putalpha(tiles.crop((0, 29 * 16, 16, 30 * 16)).getchannel('A'))
+    tiles.paste(lamp, (0, 52 * 16))
+    # rows 53-54: stairs seen from above, going down into the dark and coming up into light
+    for row, down in ((53, True), (54, False)):
+        st = Image.new('RGBA', (16, 16), (40, 36, 48, 255)); d3 = ImageDraw.Draw(st)
+        for i in range(5):
+            shade = (30 + i * 30 if not down else 150 - i * 30)
+            d3.rectangle([1, 1 + i * 3, 14, 3 + i * 3], fill=(shade, shade, shade + 12, 255))
+        d3.rectangle([0, 0, 15, 15], outline=(20, 18, 26, 255))
+        tiles.paste(st, (0, row * 16))
+    return tiles
+
 def main():
     k = Image.new('RGBA', (144, 66), CLEAR); k.paste(keeper(False), (0, 0)); k.paste(keeper(True), (72, 0))
     k.save(os.path.join(OUT, 'king.png'))
@@ -131,8 +181,13 @@ def main():
     if tiles.height < 47 * 16:
         grown = Image.new('RGBA', (tiles.width, 47 * 16), CLEAR); grown.paste(tiles, (0, 0)); tiles = grown
     for f in range(2): tiles.paste(junction(f), (f * 16, 46 * 16))
+    tiles = stage_rows(tiles)
     tiles.save(os.path.join(OUT, 'tiles.png'))
     print('wrote original art to', OUT)
 
 if __name__ == '__main__':
-    main()
+    if '--stage-rows' in sys.argv:      # only the stage tiles, into the tiles.png already in OUT
+        OUT = next((a for a in sys.argv[1:] if not a.startswith('--')), OUT)
+        p = os.path.join(OUT, 'tiles.png'); stage_rows(Image.open(p).convert('RGBA')).save(p); print('stage rows written')
+    else:
+        main()

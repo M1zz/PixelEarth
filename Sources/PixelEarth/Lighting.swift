@@ -16,7 +16,7 @@ final class LightMap {
         srcs.reserveCapacity(8192)
     }
 
-    func compute(world: World, x0 ix0: Int, y0 iy0: Int, x1 ix1: Int, y1 iy1: Int, sky: RGB, extra: [LightSource]) {
+    func compute(world: World, x0 ix0: Int, y0 iy0: Int, x1 ix1: Int, y1 iy1: Int, sky: RGB, extra: [LightSource], stages: [(Int, RGB)] = []) {
         let x0 = max(0, ix0), y0 = max(0, iy0), x1 = min(w - 1, ix1), y1 = min(h - 1, iy1)
         if x1 < x0 || y1 < y0 { return }
         srcs.removeAll(keepingCapacity: true)
@@ -41,6 +41,18 @@ final class LightMap {
                 if t != Tile.crystal && (TILES[t].solid || t == Tile.leaves || t == Tile.snowleaf) { break }
                 if y >= y0 { srcs.append(LightSource(x: x, y: y, r: sky.r, g: sky.g, b: sky.b)) }
                 y += 1
+            }
+        }
+        // each stage's own sky: open columns from the floor's ceiling down to the first solid tile
+        for (c, l) in stages where c <= y1 {
+            for x in x0...x1 {
+                var y = c
+                while y <= y1 {
+                    let t = Int(tiles[y * w + x])
+                    if (TILES[t].solid && t != Tile.glass) || t == Tile.leaves { break }
+                    if y >= y0 { srcs.append(LightSource(x: x, y: y, r: l.r, g: l.g, b: l.b)) }
+                    y += 1
+                }
             }
         }
         for e in extra where e.x >= x0 && e.x <= x1 && e.y >= y0 && e.y <= y1 { srcs.append(e) }

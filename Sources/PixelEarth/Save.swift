@@ -36,6 +36,7 @@ struct SaveData: Codable {
     var siege: Siege? = nil
     var nextSiegeT: Double? = nil
     var passagesSeen: [Int]? = nil
+    var layoutVersion: Int? = nil
 }
 
 enum SaveStore {
@@ -54,7 +55,7 @@ enum SaveStore {
                          spawnX: g.spawnX, spawnY: g.spawnY, worldTime: g.worldTime, day: g.day, zoom: zoom, sound: sound,
                          jar: g.jar, act: g.act, storyT: g.storyT, disasterStruck: g.disasterStruck, skyFactor: g.skyFactor,
                          layersSeen: Array(g.layersSeen), ascent: g.ascent, pedestalState: w.pedestalState,
-                         tutorialStep: g.tutorialStep, tutorialCalm: g.tutorialCalm, tremorStage: g.tremorStage, freeChestX: g.freeChest?.x, freeChestY: g.freeChest?.y, reigns: g.reigns, siege: g.siege, nextSiegeT: g.nextSiegeT, passagesSeen: Array(g.passagesSeen))
+                         tutorialStep: g.tutorialStep, tutorialCalm: g.tutorialCalm, tremorStage: g.tremorStage, freeChestX: g.freeChest?.x, freeChestY: g.freeChest?.y, reigns: g.reigns, siege: g.siege, nextSiegeT: g.nextSiegeT, passagesSeen: Array(g.passagesSeen), layoutVersion: w.layoutVersion)
         do {
             try JSONEncoder().encode(d).write(to: url, options: .atomic)
         } catch { NSLog("save failed: \(error)") }
@@ -75,6 +76,10 @@ enum SaveStore {
         g.spawnX = d.spawnX; g.spawnY = d.spawnY; g.worldTime = d.worldTime; g.day = d.day
         g.enemies = []; g.drops = []; g.arrows = []; g.floats = []; g.particles = []; g.boss = nil
         w.computeStoryRefs()
+        w.layoutVersion = d.layoutVersion ?? 1
+        if w.layoutVersion < 2 { w.ensureStrata(full: false) }   // older worlds: strata over solid ground only
+        if w.layoutVersion < 3 { w.ensureLightSprings(); w.layoutVersion = 3 }
+        if w.layoutVersion < 4 { w.ensureTrunks(); w.layoutVersion = 4 }
         w.ensureLairs(); w.ensureJunctions()
         g.passagesSeen = Set(d.passagesSeen ?? [])
         g.reigns = d.reigns ?? Game.freshReigns(); g.siege = d.siege; g.floorLord = nil; g.nextSiegeT = d.nextSiegeT ?? Double.random(in: Reign.siegeInterval)
@@ -83,8 +88,10 @@ enum SaveStore {
         g.skyFactor = d.skyFactor ?? 0.22; g.skyTarget = g.act >= 5 ? 1 : (g.act == 3 ? 0.22 + 0.78 * (d.ascent ?? 0) : (g.disasterStruck ? 0.22 : 1))
         g.layersSeen = Set(d.layersSeen ?? []); g.ascent = d.ascent ?? 0; w.pedestalState = d.pedestalState ?? [:]; g.pendingChoice = false
         g.tutorialStep = d.tutorialStep ?? Tutorial.done; g.tutorialCalm = d.tutorialCalm ?? 0; g.tremorStage = d.tremorStage ?? 2
+        if !w.hasHouses { g.tutorialStep = Tutorial.done }   // worlds from before the errand
         g.tutorialWalked = 0; g.tutorialLastX = p.x; g.tutorialSlimeT = 0; g.jarLooked = false; g.jarCovered = false
         if let x = d.freeChestX, let y = d.freeChestY { g.freeChest = (x, y) } else { g.freeChest = nil }
+        g.grantPickaxeIfMissing()
         g.loaded = true
         lastLoaded = d
         return true

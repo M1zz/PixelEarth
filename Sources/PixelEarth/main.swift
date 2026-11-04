@@ -5,7 +5,8 @@ import SpriteKit
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     var window: NSWindow!
     var skView: SKView!
-    var scene: GameScene!
+    var scene: GameScene?
+    var tdScene: TDScene!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let screen = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
@@ -25,9 +26,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         skView.showsFPS = false
         window.contentView = skView
 
-        scene = GameScene(size: rect.size)
-        scene.scaleMode = .resizeFill
-        skView.presentScene(scene)
+        // The top-down game is the game now; the side view stays reachable from its title (V).
+        tdScene = TDScene(size: rect.size)
+        tdScene.scaleMode = .resizeFill
+        tdScene.onClassic = { [weak self] in self?.showClassic() }
+        skView.presentScene(tdScene)
 
         // Set the Dock icon from the bundle directly, so a stale Launch Services record from an older build cannot hide it.
         if let icon = NSImage(named: "AppIcon") ?? Bundle.main.url(forResource: "AppIcon", withExtension: "icns").flatMap(NSImage.init(contentsOf:)) {
@@ -36,6 +39,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         buildMenu()
+    }
+
+    func showClassic() {
+        let s = GameScene(size: skView.bounds.size); s.scaleMode = .resizeFill
+        scene = s; skView.presentScene(s)
+        window.makeFirstResponder(skView)
     }
 
     func buildMenu() {
@@ -53,8 +62,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         NSApp.mainMenu = main
     }
 
-    func windowWillClose(_ notification: Notification) { scene?.save(); NSApp.terminate(nil) }
-    func applicationWillTerminate(_ notification: Notification) { scene?.save() }
+    func windowWillClose(_ notification: Notification) { scene?.save(); tdScene?.save(); NSApp.terminate(nil) }
+    func applicationWillTerminate(_ notification: Notification) { scene?.save(); tdScene?.save() }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
 }
 

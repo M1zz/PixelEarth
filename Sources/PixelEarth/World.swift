@@ -50,6 +50,8 @@ final class World {
     /// Light map used for light-gated passability (set by Game).
     weak var light: LightMap?
     var seed: UInt32 = 1
+    /// 1: before stages (older saves), 2: halls, hard rock and strata built at generation.
+    var layoutVersion = 1
     var noise = Noise(seed: 1)
     private var rng = LCG(state: 1)
 
@@ -156,7 +158,7 @@ final class World {
             if top == Tile.grass && r < 0.15 {
                 let th = 4 + rng.int(4), ty = surface[x] - th
                 if ty < 3 { continue }
-                for y in stride(from: surface[x] - 1, through: ty, by: -1) { set(x, y, Tile.wood) }
+                for y in stride(from: surface[x] - 1, through: ty, by: -1) { set(x, y, Tile.trunk) }
                 // rounded canopy, slightly wider than tall
                 let rw = 2.6 + rng.next() * 0.8, rh = 2.2 + rng.next() * 0.6
                 for dy in -3...2 { for dx in -3...3 {
@@ -208,7 +210,9 @@ final class World {
                 }
             }
         }
+        buildHouses()
         generateStory()
+        buildStages()
     }
 
     // MARK: story geometry — layers, camp crevice, descent shaft, gated tiles
@@ -255,6 +259,8 @@ final class World {
         for p in pedestals { set(p.x, p.y, Tile.pedestal); set(p.x, p.y + 1, Tile.brick) }
         set(cx - 5, Layers.campBottom - 1, Tile.greenSpore); set(cx + 6, Layers.campBottom - 1, Tile.flower)
         set(cx - 16, Layers.campBottom - 1, Tile.bench)
+        // someone left a pickaxe at the camp: the first tool that opens stone and the cracked veins
+        set(cx + 16, Layers.campBottom - 1, Tile.chest); chests["\(cx + 16),\(Layers.campBottom - 1)"] = [ItemStack(id: Item.woodPick, n: 1), ItemStack(id: Tile.torch, n: 6)]
         // --- descent shaft (recorded, not dug yet): 3 wide, platforms every 6 rows, then a tunnel into the chamber
         computeStoryRefs()
         // --- red layer: lava shelves, hidden veins beside caves, red spores

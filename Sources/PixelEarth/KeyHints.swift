@@ -32,9 +32,9 @@ extension Game {
         guard act == 1, !disasterStruck else { return [] }
         switch tutorialStep {
         case Tutorial.look: return [hint(HintSymbol.jar, "J", "hint.jar", urgent: true)]
-        case Tutorial.walk: return [hint(HintSymbol.move, "key.ad", "hint.move", urgent: true)]
-        case Tutorial.jump: return [hint(HintSymbol.jump, "key.space", "hint.jump", urgent: true)]
-        case Tutorial.follow: return [hint(HintSymbol.move, "key.ad", "hint.follow", urgent: true)]
+        case Tutorial.houseA, Tutorial.houseB, Tutorial.houseC:
+            return [hint(HintSymbol.move, "key.ad", "hint.move", urgent: true), hint(HintSymbol.jump, "key.space", "hint.jump"), hint(HintSymbol.use, "key.lmb", "hint.giveLight")]
+        case Tutorial.box: return [KeyHint(symbol: "eye", key: "Tab", text: L("hint.lensHidden"), urgent: !(lensActive && lens == .hidden)), hint(HintSymbol.mine, "key.lmb", "hint.mineHold")]
         case Tutorial.feed:
             return [player.held?.id == Tile.greenSpore ? hint(HintSymbol.feed, "F", "hint.feed", urgent: true) : holdHint(Tile.greenSpore)].compactMap { $0 }
         case Tutorial.cover: return [hint(HintSymbol.jar, "C", jarCovered ? "hint.uncover" : "hint.cover", urgent: true)]
@@ -64,6 +64,7 @@ extension Game {
             return [hint(HintSymbol.use, "key.lmb", "hint.inspect")]
         }
         if t == Tile.core { return [hint(HintSymbol.use, "key.lmb", "hint.touchCore")] }
+        if t == Tile.lightSpring { return [KeyHint(symbol: "sun.max", key: L("key.lmb"), text: L("hint.spring"), urgent: true)] }
         if t == Tile.pedestal {
             let want = [0, Tile.redPlant, Tile.greenPlant, Tile.bluePlant][pedestalWants(tx)]
             if (world.pedestalState["\(tx),\(ty)"] ?? 0) == 0 && player.held?.id == want { return [hint(HintSymbol.place, "key.rmb", "hint.plant")] }

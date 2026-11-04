@@ -243,3 +243,64 @@ straw mattress, patched wool blanket, a small lantern hook on the headboard.
 
 ### 9. 주인공 걷기 보강 — `player_walk6.png`
 지금 시트는 걷기가 5프레임이라 한 장을 반복합니다. 같은 주인공으로 걷기 6프레임을 4줄(기본, 철, 금, 다이아 갑옷)로, 프레임당 20×32px 격자에 정확히 맞춰 주면 됩니다.
+
+
+---
+
+# 탑다운 2차 요청
+
+모든 그림에 붙일 문장:
+
+```
+top-down 3/4 view like classic Pokémon or Stardew Valley, 16x16 pixel grid, crisp pixel art, no anti-aliasing,
+limited palette matching the earlier Nael set (deep violet-grey stone, teal moss, warm lantern light),
+transparent background, no text, no watermark
+```
+
+## 1순위
+1. `td_houses.png` 마을 집 4채 (이웃 셋, 할머니 집 하나). 집마다 지붕과 앞벽, 아래쪽 가운데 문, 창문 하나. 각 80x64(5x4칸).
+2. `td_objects.png` 16x16 물건 한 줄: 닫힌 상자, 열린 상자, 빈 등불, 켜진 등불, 빛샘(빛나는 작은 샘), 내려가는 계단(어두운 구멍과 돌계단), 올라가는 계단, 왕좌(32x32), 빛의 심장(32x32).
+3. `td_water.png` 물과 용암: 16x16 가운데 칸 4프레임 물결, 물가 경계 위·아래·왼쪽·오른쪽·모서리.
+
+## 2순위
+4. `td_cave_props.png` 동굴 소품 16x16 또는 16x32: 종유석, 빛 수정 무더기, 버섯 무더기, 돌무더기, 뿌리, 오래된 표지, 뼈 대신 버려진 등불.
+5. `td_floor_sets.png` 5~9층 벽과 바닥 색 바꾼 판: 5층 뿌리 감긴 초록 숲 벽, 6층 따뜻한 붉은 굴 벽, 7층 물벽(반투명 물이 벽처럼 선 모습), 8층 거의 검은 벽, 9층 흰 대리석 창고 벽. 각 층 윗면 4칸 + 앞면 4칸 + 바닥 4칸.
+6. `td_grandma.png` 할머니 네 방향 x 2프레임, 16x24.
+
+## 3순위
+7. `td_enemies.png` 빛굶주린 자 네 방향 x 4프레임 16x24, 박쥐 날갯짓 4프레임 16x16.
+8. `td_lords.png` 층 주인 다섯을 위에서 본 모습 32x40, 각 2프레임.
+
+---
+
+## 탑다운 3차 요청: 귀엽고 뽀짝한 스타일 + 애니메이션 프레임
+
+코드로 넣은 움직임(통통 튀는 걸음, 숨쉬기, 찌그러짐, 그림자, 굴뚝 연기, 반딧불)은 그림이 바뀌어도 그대로 얹힙니다.
+그림은 "귀여운 2등신" 쪽으로 다시 그려 주세요. 모든 프롬프트 끝에 아래 공통 문장을 붙입니다.
+
+공통 문장:
+cute chibi pixel art, 2-heads-tall proportions, big round head, big shiny eyes with a white highlight, soft rounded shapes,
+1px dark outline (not pure black, use deep plum #2a1e2e), pastel but warm palette with teal moss and lantern gold accents,
+top-down 3/4 view like Pokémon or Stardew Valley, 16x16 grid, crisp pixels, no anti-aliasing, transparent background,
+frames laid out left to right in one row per animation, equal cell size, no text, no watermark
+
+1. td_hero_cute.png (칸 16x24)
+   행 순서: 대기 아래/왼/오른/위 각 2프레임, 걷기 아래/왼/오른/위 각 4프레임, 휘두르기 아래/왼/오른/위 각 3프레임, 구르기 4프레임, 맞음 1프레임, 쓰러짐 2프레임
+   prompt: a small chibi child explorer with a red scarf and a tiny glowing glass jar on a strap, round face, rosy cheeks, idle breathing, bouncy walk cycle, small swing with a stick, tumble roll
+2. td_grandma_cute.png (칸 16x24)
+   대기 4방향 x 2프레임, 손 흔들기 3프레임
+   prompt: a tiny chibi grandmother with a round bun, shawl and a little lantern cane, kind closed-eye smile, gentle idle sway, waving
+3. td_critters_cute.png (칸 16x16)
+   점액 대기 2 + 통통 튀기 4 + 맞음 1, 박쥐 날갯짓 4, 빛굶주린 자 걷기 4방향 x 4
+   prompt: a round jelly slime with big sparkly eyes and a tiny mouth, a fluffy round bat with oversized ears, a shy hooded shadow creature with two glowing dot eyes (spooky but cute)
+4. td_lords_cute.png (칸 32x32)
+   층 주인 다섯(5~9층) x 대기 2 + 돌진 준비 2 + 맞음 1
+   prompt: five chibi floor lords, each with a clear silhouette: a forest keeper with a leaf crown, a sleepless digger with a lamp helmet, a tide guardian with a shell shield, a dark watcher wrapped in a starry cloak, a white marble archivist with a book; wind-up pose with a little sweat drop
+5. td_fx_cute.png (칸 16x16)
+   휘두르기 반달 3프레임, 먼지 퐁 4프레임, 반짝 별 4프레임, 하트 1, 연기 4프레임, 물 반짝임 4프레임
+   prompt: tiny cute effect sprites: slash crescent, round dust puff, four-point sparkle star, small heart, chimney smoke puff, water glint
+6. td_village_cute.png
+   나무 32x40 흔들림 2프레임, 꽃 16x16 흔들림 2프레임 x 3색, 집 80x64 x 3채 (둥근 지붕, 동그란 창문, 문 옆 등불 꺼짐/켜짐)
+   prompt: round fluffy trees, tiny swaying flowers, cozy small cottages with rounded roofs, round windows and a lantern by the door (unlit and lit versions)
+
+우선순위: 1 주인공, 3 작은 적, 5 효과, 6 마을, 2 할머니, 4 층 주인

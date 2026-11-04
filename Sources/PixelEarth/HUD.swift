@@ -22,6 +22,15 @@ final class HUD {
     private let clock = SKLabelNode(fontNamed: HUD.fontMono)
     private let dayLabel = SKLabelNode(fontNamed: HUD.fontMono)
     private let message = SKLabelNode(fontNamed: HUD.fontBold)
+    private let stageNode = SKNode()
+    private lazy var progressLabel = label("", size: 13, color: SKColor(red: 1, green: 0.85, blue: 0.55, alpha: 1))
+    /// The jar's lens modes, under the jar: click one or press Tab to cycle.
+    private let lensRow = SKNode()
+    private var lensButtons: [SKNode] = []
+    /// How much light is left in the jar.
+    private let energyBack = SKSpriteNode(color: SKColor(white: 0, alpha: 0.6), size: CGSize(width: 124, height: 8))
+    private let energyFill = SKSpriteNode(color: .white, size: CGSize(width: 120, height: 4))
+    private lazy var energyText = label("", size: 13, color: SKColor(white: 0.85, alpha: 1))
     private let tipLabel = SKLabelNode(fontNamed: HUD.fontBold)
     private var msgQueue: [String] = []
     let hintBar = SKNode()
@@ -88,6 +97,15 @@ final class HUD {
         jarIcon.size = CGSize(width: CGFloat(JarArt.w * 2), height: CGFloat(JarArt.h * 2)); jarIcon.name = "btn:jar"
         jarLabel.fontSize = 13; jarLabel.fontColor = SKColor(white: 0.85, alpha: 1); jarLabel.horizontalAlignmentMode = .left; jarLabel.verticalAlignmentMode = .center; jarLabel.name = "btn:jar"
         root.addChild(jarIconGlow); root.addChild(jarIcon); root.addChild(jarLabel)
+        for m in Lens.allCases {
+            let b = makeButton(L(m.titleKey), name: "lens:\(m.rawValue)", width: 70, height: 22, fontSize: 13)
+            b.position = CGPoint(x: CGFloat(m.rawValue) * 74, y: 0); lensRow.addChild(b); lensButtons.append(b)
+        }
+        let tabKey = label("Tab", size: 13, color: SKColor(white: 0.7, alpha: 1)); tabKey.position = CGPoint(x: CGFloat(Lens.allCases.count) * 74 - 28, y: 0); lensRow.addChild(tabKey)
+        root.addChild(lensRow)
+        energyBack.anchorPoint = CGPoint(x: 0, y: 0.5); energyFill.anchorPoint = CGPoint(x: 0, y: 0.5); energyFill.position = CGPoint(x: 2, y: 0)
+        energyBack.addChild(energyFill); energyText.position = CGPoint(x: 132, y: 0); energyBack.addChild(energyText)
+        root.addChild(energyBack)
         for (i, (name, symbol, text, key)) in [("btn:craft", "wrench.and.screwdriver", "button.craft", "E"), ("btn:inv", "bag", "button.bag", "I"), ("btn:jar", "sparkles", "button.jar", "J"), ("btn:reign", "crown", "button.reign", "R"), ("btn:map", "map", "button.map", "M"), ("btn:menu", "line.3.horizontal", "button.menu", "ESC")].enumerated() {
             let b = makeKeyButton(symbol: symbol, text: L(text), key: key, name: name)
             b.position = CGPoint(x: 0, y: -CGFloat(i) * 32); buttons.addChild(b)
@@ -141,7 +159,9 @@ final class HUD {
         message.position = CGPoint(x: 0, y: hh * 0.45 + 12); message.preferredMaxLayoutWidth = min(900, hw * 2 - 360)
         tipLabel.position = CGPoint(x: 0, y: -hh + 124)
         hintBar.position = CGPoint(x: 0, y: -hh + 70); heldLabel.position = CGPoint(x: 0, y: -hh + 98)
-        objectivePanel.position = CGPoint(x: -hw + 14, y: hh - 118)
+        energyBack.position = CGPoint(x: -hw + 60, y: hh - 104)
+        lensRow.position = CGPoint(x: -hw + 50, y: hh - 124)
+        objectivePanel.position = CGPoint(x: -hw + 14, y: hh - 144)
         bossBg.position = CGPoint(x: 0, y: hh - 30); bossBar.position = CGPoint(x: -128, y: hh - 30); bossLabel.position = CGPoint(x: 0, y: hh - 48)
         panel?.position = .zero; menu?.position = .zero
     }
@@ -191,6 +211,17 @@ final class HUD {
         jarIcon.texture = JarArt.texture(game.jar, frame: [0, 1, 2, 1][Int(game.storyT * 2.2) % 4])
         updateObjective(game)
         updateHints(game)
+        let e = game.jar.energy, cap = game.jar.energyCap, ef = CGFloat(e / cap)
+        energyFill.size.width = 120 * ef
+        energyFill.color = SKColor(red: CGFloat(jl.r) / 15 * 0.5 + 0.5, green: CGFloat(jl.g) / 15 * 0.5 + 0.5, blue: CGFloat(jl.b) / 15 * 0.5 + 0.4, alpha: 1)
+        energyFill.alpha = ef < 0.2 ? 0.5 + 0.5 * CGFloat(abs(sin(game.storyT * 5))) : 1
+        energyText.text = String(format: L("energy.hud"), Int(e.rounded()), Int(cap))
+        for (i, b) in lensButtons.enumerated() {
+            let on = game.lensActive && i == game.lens.rawValue
+            b.alpha = on ? 1 : 0.5
+            (b.children.first as? SKSpriteNode)?.color = on ? SKColor(red: 1, green: 0.7, blue: 0.24, alpha: 1) : SKColor(red: 0.16, green: 0.19, blue: 0.27, alpha: 0.95)
+            (b.children.last as? SKLabelNode)?.fontColor = on ? .black : .white
+        }
         jarIconGlow.color = SKColor(red: CGFloat(jl.r) / 15, green: CGFloat(jl.g) / 15, blue: CGFloat(jl.b) / 15, alpha: 1)
         jarIconGlow.alpha = CGFloat(0.25 + Double(game.jar.brightness) / 15 * 0.45) * CGFloat(game.jarDim)
         jarIconGlow.setScale(game.jarNearOre ? 1 + CGFloat(abs(sin(game.storyT * 6))) * 0.25 : 1)
@@ -200,6 +231,11 @@ final class HUD {
 
     /// Sized to its text each frame so the one panel fits every step, in either language.
     private func updateObjective(_ game: Game) {
+        // the long goal, always under the next step
+        if progressLabel.parent == nil { root.addChild(progressLabel) }
+        progressLabel.text = game.progressText ?? ""
+        progressLabel.position = CGPoint(x: -hw + 18, y: objectivePanel.position.y - objectivePanel.size.height - 12)
+        if objectivePanel.isHidden { progressLabel.position.y = objectivePanel.position.y - 10 }
         guard let o = game.objective else { objectivePanel.isHidden = true; return }
         objectivePanel.isHidden = false
         objectiveTitle.text = o.title; objectiveDetail.text = o.detail
@@ -222,6 +258,22 @@ final class HUD {
         }
         message.text = t; msgT = HUD.readTime(t); message.alpha = 1
     }
+    /// Arriving on a floor: the floor number, its name large, and its line, fading in and out like a stage title.
+    func showStage(number: String, name: String, line: String, tint: (Float, Float, Float, Float)) {
+        stageNode.removeAllActions(); stageNode.removeAllChildren()
+        if stageNode.parent == nil { stageNode.zPosition = 46; root.addChild(stageNode) }
+        stageNode.position = CGPoint(x: 0, y: hh * 0.16)
+        let c = SKColor(red: CGFloat(0.55 + tint.0 * 0.45), green: CGFloat(0.55 + tint.1 * 0.45), blue: CGFloat(0.55 + tint.2 * 0.45), alpha: 1)
+        let num = label(number, size: 18, color: c, align: .center); num.position = CGPoint(x: 0, y: 34)
+        let big = label(name, size: 36, color: .white, align: .center); big.position = CGPoint(x: 0, y: 0)
+        let sub = label(line, size: 17, color: SKColor(white: 0.85, alpha: 1), align: .center); sub.position = CGPoint(x: 0, y: -36)
+        sub.numberOfLines = 0; sub.preferredMaxLayoutWidth = min(760, hw * 2 - 200); sub.verticalAlignmentMode = .top; sub.position.y = -26
+        let rule = SKSpriteNode(color: c, size: CGSize(width: 220, height: 2)); rule.position = CGPoint(x: 0, y: -18); rule.alpha = 0.7
+        for n in [num, big, rule, sub] as [SKNode] { stageNode.addChild(n) }
+        stageNode.alpha = 0; stageNode.setScale(0.96)
+        stageNode.run(.sequence([.group([.fadeIn(withDuration: 0.7), .scale(to: 1, duration: 0.7)]), .wait(forDuration: 3.2), .fadeOut(withDuration: 1.0)]))
+    }
+
     func showTip(_ t: String) { tipLabel.text = t; tipT = HUD.readTime(t); tipLabel.alpha = 1 }
 
     func rebuildHotbar(_ game: Game) {
@@ -461,6 +513,9 @@ final class HUD {
             }
             return true
         case "close": closePanels(); return true
+        case "lens":
+            if let i = Int(parts[1]), let m = Lens(rawValue: i) { game.selectLens(m) }
+            return true
         case "lore":
             if parts[1] == "back" { openPanel(.reign) } else if let f = Int(parts[1]) { loreFloor = f; openPanel(.lore) }
             return true

@@ -50,7 +50,7 @@ final class Game {
     /// The jar's light this frame: hurt dims it, the cloth nearly hides it, danger makes it flinch.
     var jarStrength: Double {
         if jarCovered { return 0.15 }
-        return jarDim * (0.4 + 0.6 * Double(max(0, player.hp)) / Double(max(1, player.maxhp)))
+        return jarDim * (0.4 + 0.6 * Double(max(0, player.hp)) / Double(max(1, player.maxhp))) * (jarEmpty ? 0.35 : 1)
     }
     /// Light-led creatures follow the player only while they can see the jar, or when close enough to smell them.
     func seesPlayer(_ e: Enemy, dist: Double) -> Bool { !jarCovered || dist < 3.5 || e.lordFloor != nil || e.attackerCost > 0 }
@@ -63,6 +63,14 @@ final class Game {
     var pendingChoice = false
     // --- the first afternoon (see Tutorial.swift); saves from before it count as finished
     var shownTorchEaten = false
+    var lens = Lens.path
+    var lensActive = false
+    var flickerT = 12.0, shownFlicker = false
+    var warnedLowEnergy = false
+    /// Light springs: seconds left of the brighter jar, and when each spring was last drawn from (storyT).
+    var springGlowT = 0.0
+    var springTaken: [String: Double] = [:]
+    static let springGlow = 120.0, springRefill = 180.0
     var passagesSeen: Set<Int> = []
     var tutorialStep = Tutorial.done, tutorialCalm = 0.0, tutorialWalked = 0.0, tutorialLastX = 0.0, tutorialSlimeT = 0.0
     var tutorialSpore: (x: Int, y: Int)? = nil, tutorialCovered = false
@@ -116,7 +124,7 @@ final class Game {
         layersSeen = []; passagesSeen = []; ascent = 0; pendingChoice = false; world.pedestalState = [:]
         startTutorial()
         loaded = true
-        message(L("intro.jar"))
+        message(L("intro.jar")); message(L("intro.flicker")); shownFlicker = true; flickerT = 12
     }
 
     func placePlayer() {
@@ -131,7 +139,7 @@ final class Game {
     @discardableResult
     func addItem(_ id: Int, _ nIn: Int) -> Bool {
         var n = nIn
-        if countItem(id) == 0 { newItemId = id; newItemT = 8 }
+        if countItem(id) == 0 { newItemId = id; newItemT = 8; if id == Game.pickaxe { message(L("pickaxe.got")) } }
         if itemStackable(id) {
             for i in 0..<40 {
                 if var s = player.inv[i], s.id == id, s.n < 99 {
@@ -183,7 +191,7 @@ final class Game {
             message("\(it.name) 장착 (피해 -\(Int(it.armor * 100))%)")
         case .life:
             if player.maxhp >= 200 { tip("최대 체력이 한계입니다"); return false }
-            player.maxhp += 20; player.hp += 20; sfx(.heal); message(L("shard.used"))
+            player.maxhp += 20; player.hp += 20; sfx(.heal); message(L("shard.used")); gainEnergy(Game.shardGain)
         }
         s.n -= 1
         player.inv[i] = s.n <= 0 ? nil : s
@@ -210,7 +218,8 @@ final class Game {
     struct HeldStats { var tier: Int; var power: Double; var dmg: Int; var tool: ToolKind? }
     func heldStats() -> HeldStats {
         if let h = player.held, let it = ITEMS[h.id], it.tool == .bow { return HeldStats(tier: 0, power: 1, dmg: it.dmg + jar.strike / 3, tool: .bow) }
-        return HeldStats(tier: jar.digTier, power: jar.digPower, dmg: jar.strike, tool: .pick)
+        // Bare hands move only soft ground; with the pickaxe the jar's light decides how hard it bites.
+        return HeldStats(tier: hasPickaxe ? jar.digTier : 0, power: jar.digPower * (jarEmpty ? 0.5 : 1), dmg: jar.strike, tool: .pick)
     }
 
     func damagePlayer(_ nIn: Int, from src: Entity? = nil) {
@@ -252,6 +261,11 @@ final class Game {
     /// Left click: use consumable, shoot, open chest, or melee an enemy under the cursor. Returns true if handled.
     func useAt(_ wx: Double, _ wy: Double) -> Bool {
         if let j = nearbyJunction() { turn(at: j.junction, inside: j.inside); return true }
+        // a spring answers K before whatever is in hand
+        let sx = Int(floor(wx)), sy = Int(floor(wy))
+        if world.get(sx, sy) == Tile.lightSpring && reach(sx, sy) { takeSpringLight(sx, sy); return true }
+        if world.get(sx, sy) == Tile.emptyLamp && reach(sx, sy) { deliverLight(sx, sy); return true }
+        if world.get(sx, sy) == Tile.chest && reach(sx, sy) { openChest(sx, sy); return true }
         let st = heldStats()
         if let h = player.held, let it = ITEMS[h.id], it.use != nil { useItem(slot: player.sel); return true }
         if st.tool == .bow {
@@ -266,6 +280,7 @@ final class Game {
         if world.get(tx, ty) == Tile.chest && reach(tx, ty) { openChest(tx, ty); return true }
         if world.get(tx, ty) == Tile.core && reach(tx, ty) { touchCore(); return true }
         if world.get(tx, ty) == Tile.throne && reach(tx, ty) { touchThrone(tx, ty); return true }
+        if world.get(tx, ty) == Tile.lightSpring && reach(tx, ty) { takeSpringLight(tx, ty); return true }
         if world.get(tx, ty) == Tile.pedestal && reach(tx, ty) { tip(pedestalHint(tx, ty)); return true }
         if world.get(tx, ty) == Tile.door && reach(tx, ty) { return true }
         var near = false
@@ -304,6 +319,15 @@ final class Game {
         return best
     }
 
+    func takeSpringLight(_ x: Int, _ y: Int) {
+        let key = "\(x),\(y)"
+        if let t = springTaken[key], storyT - t < Game.springRefill { tip(String(format: L("spring.wait"), Int(Game.springRefill - (storyT - t)))); return }
+        springTaken[key] = storyT; springGlowT = Game.springGlow; gainEnergy(Game.springGain)
+        _ = addItem(Tile.torch, 3); sfx(.heal)
+        for _ in 0..<24 { particles.append(Particle(x: Double(x) + 0.5, y: Double(y) + 0.5, vx: Double.random(in: -3...3), vy: Double.random(in: -6 ... -1), t: 1, life: 1, color: RGB(r: 230, g: 250, b: 210))) }
+        message(L("spring.take"))
+    }
+
     func setTile(_ x: Int, _ y: Int, _ v: Int) { world.set(x, y, v); onTileChanged?(x, y) }
 
     func tryMine(_ dt: Double, _ wx: Double, _ wy: Double) {
@@ -315,7 +339,7 @@ final class Game {
         player.face = wx > player.x ? 1 : -1; player.swing = 0.22
         let same = mineTarget.map { $0.x == tx && $0.y == ty } ?? false
         if tileTier(t) > st.tier {
-            if !same { tip(t == Tile.rubble ? "무너진 암석 — 아직은 뚫을 수 없다" : (tileTier(t) >= 9 ? "부술 수 없습니다" : "빛이 더 자라야 한다 — 병을 등불만큼 키우자")) }
+            if !same { tip(digRefusal(t)) }
             mineTarget = (tx, ty); mineProg = 0; return
         }
         if !same { mineTarget = (tx, ty); mineProg = 0 }
@@ -349,17 +373,18 @@ final class Game {
     func breakTile(_ tx: Int, _ ty: Int) {
         let t = world.get(tx, ty); if t == Tile.air { return }
         let td = TILES[t]
+        jar.energy -= td.tier >= 1 ? 0.4 : 0.1      // every blow the light gives costs a little of it
         setTile(tx, ty, Tile.air); sfx(.brk)
         var drop = td.drop ?? t
         if t == Tile.hiddenVein { drop = world.gateOpen(tx, ty, t) ? (ty >= Layers.darkTop ? Item.diamond : Tile.gold) : Tile.stone }
         if t == Tile.rubble && Double.random(in: 0..<1) < 0.3 { drop = -1 }
         if drop >= 0 { dropItem(drop, 1, Double(tx) + 0.5, Double(ty) + 0.5) }
         spawnDust(tx, ty, td.dust, 7)
-        if t == Tile.wood || t == Tile.pine {
+        if t == Tile.pine || t == Tile.trunk {   // a placed wood block is just a block; only living trees fall
             var y = ty - 1, n = 0
             while world.get(tx, y) == t { setTile(tx, y, Tile.air); n += 1; y -= 1 }
             if n > 0 { dropItem(Tile.wood, n, Double(tx) + 0.5, Double(ty) - 0.5) }
-            let leaf = t == Tile.wood ? Tile.leaves : Tile.snowleaf
+            let leaf = t == Tile.pine ? Tile.snowleaf : Tile.leaves
             for yy in (y - 3)...ty { for xx in (tx - 4)...(tx + 4) where world.get(xx, yy) == leaf {
                 setTile(xx, yy, Tile.air)
                 if Double.random(in: 0..<1) < 0.08 { dropItem(Tile.leaves, 1, Double(xx) + 0.5, Double(yy) + 0.5) }
@@ -440,6 +465,8 @@ final class Game {
             updateDefense(dt)
             return
         }
+        springGlowT = max(0, springGlowT - dt)
+        updateEnergy(dt)
         updateStory(dt)
         updateReigns(dt)
         updateDefense(dt)
@@ -668,12 +695,14 @@ final class Game {
     // MARK: lighting
 
     func recomputeLight(x0: Int, y0: Int, x1: Int, y1: Int) {
-        let jl = jar.light, k = jarStrength
+        // The jar always lights a little way around the player; a spring's glow lights much further for a while.
+        let base = jar.light, lift = springGlowT > 0 ? 6 : 3
+        let jl = RGB(r: min(15, base.r + lift), g: min(15, base.g + lift), b: min(15, base.b + lift)), k = jarStrength
         let px = Int(floor(player.x)), py = Int(floor(player.y + 1))
         var extra = [LightSource(x: px, y: py, r: Int(Double(jl.r) * k), g: Int(Double(jl.g) * k), b: Int(Double(jl.b) * k))]
         // the jar glows wide: seed the four neighbours too so the core stays bright when it is held
         for (dx, dy) in [(-1, 0), (1, 0), (0, -1)] { extra.append(LightSource(x: px + dx, y: py + dy, r: max(0, Int(Double(jl.r) * k) - 1), g: max(0, Int(Double(jl.g) * k) - 1), b: max(0, Int(Double(jl.b) * k) - 1))) }
         if let b = boss { extra.append(LightSource(x: Int(floor(b.x)), y: Int(floor(b.y + 1)), r: 4, g: 9, b: 12)) }
-        light.compute(world: world, x0: x0, y0: y0, x1: x1, y1: y1, sky: skyLight, extra: extra)
+        light.compute(world: world, x0: x0, y0: y0, x1: x1, y1: y1, sky: skyLight, extra: extra, stages: Stage.floors.map { (Stage.ceiling($0), Stage.sky($0).light) })
     }
 }

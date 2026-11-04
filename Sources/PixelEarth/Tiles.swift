@@ -11,7 +11,8 @@ enum Tile {
     static let rubble = 31, crystal = 32, redSpore = 33, blueSpore = 34, greenSpore = 35
     static let hiddenVein = 36, ghostStone = 37, tideWall = 38, pedestal = 39, core = 40
     static let redPlant = 41, greenPlant = 42, bluePlant = 43, vine = 44, throne = 45, junction = 46
-    static let count = 47
+    static let stratum = 47, crack = 48, hardRock = 49, lightSpring = 50, trunk = 51, emptyLamp = 52, stairsDown = 53, stairsUp = 54, tdPath = 55, propBlock = 56
+    static let count = 57
 }
 
 /// Vertical structure of the world (tile rows). Surface is around row 95; the camp crevice is "layer 5".
@@ -89,7 +90,14 @@ let TILES: [TileDef] = {
     t[Tile.diamondOre] = TileDef(name: "다이아몬드 광석", solid: true, hardness: 4.5, tier: 3, drop: Item.diamond, autotile: true, dust: RGB(r: 127, g: 240, b: 255))
     t[Tile.flower] = TileDef(name: "꽃", hardness: 0.1, drop: -1, frames: 4, dust: RGB(r: 255, g: 107, b: 157))
     t[Tile.platform] = TileDef(name: "발판", hardness: 0.6, platform: true, frames: 4, dust: RGB(r: 196, g: 141, b: 75))
-    t[Tile.pine] = TileDef(name: "소나무", solid: true, hardness: 1.5, drop: Tile.wood, autotile: true, dust: RGB(r: 94, g: 63, b: 44))
+    // Living trees stand behind the player: walk through them, chop them only for wood.
+    t[Tile.emptyLamp] = TileDef(name: "빈 등불", hardness: 1e9, tier: 9, dust: RGB(r: 120, g: 110, b: 90), placeable: false)
+    t[Tile.stairsDown] = TileDef(name: "내려가는 계단", hardness: 1e9, tier: 9, dust: RGB(r: 90, g: 90, b: 110), placeable: false)
+    t[Tile.stairsUp] = TileDef(name: "올라가는 계단", hardness: 1e9, tier: 9, dust: RGB(r: 150, g: 150, b: 170), placeable: false)
+    t[Tile.tdPath] = TileDef(name: "흙길", hardness: 1e9, tier: 9, dust: RGB(r: 110, g: 84, b: 60), placeable: false)
+    t[Tile.propBlock] = TileDef(name: "마을 물건", hardness: 1e9, tier: 9, dust: RGB(r: 110, g: 100, b: 90), placeable: false)
+    t[Tile.trunk] = TileDef(name: "나무 기둥", hardness: 1.5, drop: Tile.wood, autotile: true, dust: RGB(r: 135, g: 90, b: 52), placeable: false)
+    t[Tile.pine] = TileDef(name: "소나무", solid: false, hardness: 1.5, drop: Tile.wood, autotile: true, dust: RGB(r: 94, g: 63, b: 44))
     t[Tile.snowleaf] = TileDef(name: "눈잎", hardness: 0.3, drop: -1, autotile: true, dust: RGB(r: 47, g: 125, b: 68))
     t[Tile.lantern] = TileDef(name: "등불", hardness: 0.3, light: RGB(r: 15, g: 13, b: 8), frames: 2, dust: RGB(r: 255, g: 224, b: 138))
     t[Tile.stonewall] = TileDef(name: "돌담", solid: true, hardness: 2.0, tier: 1, autotile: true, dust: RGB(r: 94, g: 97, b: 108))
@@ -108,6 +116,10 @@ let TILES: [TileDef] = {
     t[Tile.bluePlant] = TileDef(name: "푸른 빛풀", hardness: 0.3, light: RGB(r: 4, g: 6, b: 15), frames: 2, dust: RGB(r: 127, g: 200, b: 255))
     t[Tile.throne] = TileDef(name: "왕좌", hardness: 1e9, tier: 9, light: RGB(r: 9, g: 8, b: 5), frames: 3, dust: RGB(r: 240, g: 200, b: 90), placeable: false)
     t[Tile.junction] = TileDef(name: "갈림길", solid: true, hardness: 1e9, tier: 9, light: RGB(r: 3, g: 5, b: 8), frames: 2, dust: RGB(r: 120, g: 150, b: 190), placeable: false)
+    t[Tile.stratum] = TileDef(name: "굳은 지층", solid: true, hardness: 1e9, tier: 9, autotile: true, dust: RGB(r: 60, g: 52, b: 78), placeable: false)
+    t[Tile.crack] = TileDef(name: "갈라진 바위", solid: true, hardness: 2.4, tier: 1, drop: Tile.stone, autotile: true, dust: RGB(r: 150, g: 140, b: 170), placeable: false)
+    t[Tile.hardRock] = TileDef(name: "굳은 바위", solid: true, hardness: 1e9, tier: 9, autotile: true, dust: RGB(r: 70, g: 72, b: 88), placeable: false)
+    t[Tile.lightSpring] = TileDef(name: "빛샘", hardness: 1e9, tier: 9, light: RGB(r: 11, g: 13, b: 12), frames: 2, dust: RGB(r: 220, g: 240, b: 200), placeable: false)
     t[Tile.vine] = TileDef(name: "덩굴", hardness: 0.2, frames: 2, dust: RGB(r: 69, g: 173, b: 60), climbable: true)
     return t
 }()
@@ -138,7 +150,7 @@ struct ItemDef {
 }
 
 let ITEMS: [Int: ItemDef] = [
-    Item.woodPick: ItemDef(name: "나무 곡괭이", tool: .pick, tier: 1, power: 1.6, dmg: 5),
+    Item.woodPick: ItemDef(name: "곡괭이", tool: .pick, tier: 1, power: 1.6, dmg: 5),
     Item.stonePick: ItemDef(name: "돌 곡괭이", tool: .pick, tier: 2, power: 2.6, dmg: 7),
     Item.ironPick: ItemDef(name: "철 곡괭이", tool: .pick, tier: 3, power: 4.2, dmg: 9),
     Item.goldPick: ItemDef(name: "금 곡괭이", tool: .pick, tier: 3, power: 6.5, dmg: 10),
